@@ -20,8 +20,16 @@ func main() {
 
 	fmt.Println("");
 
-	game.PlaceShip(board1, *barco1, 1, 1);
+	game.PlaceShip(board1, barco1, 1, 1);
 
 	game.PrintBoard(board1);
+
+	fmt.Println("");
+
+	fmt.Println("hit count barco1:", barco1.HitCount);
+
+	game.AttackPosition(board1, 1, 1);
+
+	fmt.Println("hit count barco1:", barco1.HitCount);
 
 }

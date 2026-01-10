@@ -6,7 +6,7 @@ type Position struct {
 	shipReference *Ship;
 }
 
-func attack(pos Position) {
+func attack(pos *Position) {
 	pos.attacked = true;
 	
 	if (pos.shipReference != nil) {
