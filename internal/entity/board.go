@@ -1,4 +1,4 @@
-package game
+package entity
 
 import "fmt"
 
@@ -42,13 +42,13 @@ func RemoveShipFromBoard(b *Board, ship *Ship) {
 
 func AttackPosition(b *Board, x int, y int) bool {
 	fmt.Printf("atacando %v,%v\n", x, y)
-	if (CheckPosition(b, x, y)) {
-		attack(&b.positions[x][y]);
+	if CheckPosition(b, x, y) {
+		attack(&b.positions[x][y])
 
-		return true;
+		return true
 	}
 
-	return false;
+	return false
 }
 
 func CheckShipPosition(b *Board, ship *Ship, x int, y int) bool {
@@ -78,11 +78,11 @@ func CheckShipPosition(b *Board, ship *Ship, x int, y int) bool {
 }
 
 func CheckPosition(b *Board, x int, y int) bool {
-	if (x < 0 || x > 9 || y < 0 || y > 9) {
-		return false;
+	if x < 0 || x > 9 || y < 0 || y > 9 {
+		return false
 	}
 
-	return !(isAttacked(b.positions[x][y]));
+	return !(isAttacked(b.positions[x][y]))
 }
 
 func PrintBoard(b *Board) {

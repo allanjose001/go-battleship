@@ -1,7 +1,7 @@
-package game
+package entity
 
 type Fleet struct {
-	Ships [5]*Ship;
+	Ships [5]*Ship
 }
 
 func NewFleet() *Fleet {
