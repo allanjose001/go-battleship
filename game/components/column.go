@@ -1,41 +1,40 @@
-package design
+package components
 
 import (
+	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // TODO: Função de centralizar componentes internamente -> tipos de centralizar (center, end, start)
 // TODO: Text: fontSize, font, caso necessário, tipos de center
-// TODO: Container -> color, child, size, pos, center (com base no seu proprio size)
+// TODO: Container -> color, child, size, pos, center (com base no seu proprio basic.Size)
 
 // Column organiza widgets em uma coluna, com espaçamento e largura opcional fixa
 // <USAR A LARGURA DO PAI PARA ALINHAMENTO NO EIXO SECUNDARIO (X)>
 type Column struct {
-	Pos Point //posição inicial
+	Pos basic.Point //posição inicial
 
 	Spacing float32 //espaçamento vertical entre elementos
 
 	cursorY float32 //posição vertical do próximo elemento
 
-	MainAlign Align // alinhamento dos elementos no eixo principal (center, start, end)
+	MainAlign basic.Align // alinhamento dos elementos no eixo principal (center, start, end)
 
-	CrossAlign Align //eixo cruzado
+	CrossAlign basic.Align //eixo cruzado
 
 	Children []Widget //elementos da column
 
-	size Size //caso necessario
+	size basic.Size //caso necessario
 }
-
-//TODO: depois será necessário modularizar melhor NewColumn e NewRow.
 
 // NewColumn cria uma coluna e já calcula a posição de todos os widgets
 // alinhando no eixo principal (vertical) e no eixo cruzado (horizontal)
 func NewColumn(
-	pos Point,
+	pos basic.Point,
 	spacing float32,
-	parentSize Size,
-	mainAlign Align,
-	crossAlign Align,
+	parentSize basic.Size,
+	mainAlign basic.Align,
+	crossAlign basic.Align,
 	children []Widget,
 ) *Column {
 
@@ -44,21 +43,21 @@ func NewColumn(
 		Spacing:    spacing,
 		Children:   children,
 		MainAlign:  mainAlign,
-		CrossAlign: crossAlign,
+		CrossAlign: mainAlign,
 	}
 
 	// posicionamento inicial (Start/Start)
 	c.init()
 
 	// se ambos forem Start, não faz nada
-	if mainAlign == Start && crossAlign == Start {
+	if mainAlign == basic.Start && crossAlign == basic.Start {
 		return c
 	}
 
-	if mainAlign != Start {
+	if mainAlign != basic.Start {
 		c.alignMain(parentSize)
 	}
-	if crossAlign != Start {
+	if crossAlign != basic.Start {
 		c.alignCross(parentSize)
 	}
 
@@ -72,23 +71,28 @@ func (c *Column) Update() {
 	}
 }
 
-// Draw chama Draw de todos os filhos
-func (c *Column) Draw(screen *ebiten.Image) {
+func (c *Column) draw(screen *ebiten.Image, offset basic.Point) {
+	final := c.Pos.Add(offset)
 	for _, w := range c.Children {
-		w.Draw(screen)
+		w.draw(screen, final)
 	}
 }
 
-func (c *Column) alignMain(parentSize Size) {
+// Draw chama Draw de todos os filhos
+func (c *Column) Draw(screen *ebiten.Image) {
+	c.draw(screen, basic.Point{})
+}
+
+func (c *Column) alignMain(parentSize basic.Size) {
 	content := c.GetSize()
 
 	var offsetY float32
 	switch c.MainAlign {
-	case Start:
+	case basic.Start:
 		return
-	case Center:
+	case basic.Center:
 		offsetY = (parentSize.H - content.H) / 2
-	case End:
+	case basic.End:
 		offsetY = parentSize.H - content.H
 	}
 
@@ -99,17 +103,17 @@ func (c *Column) alignMain(parentSize Size) {
 	}
 }
 
-func (c *Column) alignCross(parentSize Size) {
+func (c *Column) alignCross(parentSize basic.Size) {
 	for _, w := range c.Children {
 		size := w.GetSize()
 		p := w.GetPos()
 
 		switch c.CrossAlign {
-		case Start:
+		case basic.Start:
 			continue
-		case Center:
+		case basic.Center:
 			p.X = c.Pos.X + (parentSize.W-size.W)/2
-		case End:
+		case basic.End:
 			p.X = c.Pos.X + (parentSize.W - size.W)
 		}
 
@@ -117,11 +121,11 @@ func (c *Column) alignCross(parentSize Size) {
 	}
 }
 
-func (c *Column) GetPos() Point {
+func (c *Column) GetPos() basic.Point {
 	return c.Pos
 }
 
-func (c *Column) SetPos(point Point) {
+func (c *Column) SetPos(point basic.Point) {
 	c.Pos = point
 }
 
@@ -144,16 +148,15 @@ func (c *Column) calcSize() {
 	}
 
 	//calcula size uma unica vez aqui
-	c.size = Size{W: maxW, H: totalH}
+	c.size = basic.Size{W: maxW, H: totalH}
 }
 
 // GetSize retorna dimensões da column
-func (c *Column) GetSize() Size {
+func (c *Column) GetSize() basic.Size {
 	return c.size
 }
 
-// unnecessary?
-func (c *Column) SetSize(size Size) {
+func (c *Column) SetSize(_ basic.Size) {
 	//criar logica de setsize para todos os elementos terem o size do eixo cruzado??
 }
 
@@ -164,7 +167,7 @@ func (c *Column) init() {
 	for i, w := range c.Children {
 		size := w.GetSize()
 
-		w.SetPos(Point{
+		w.SetPos(basic.Point{
 			X: c.Pos.X, // cross como Start
 			Y: cursorY, // main sequencial
 		})

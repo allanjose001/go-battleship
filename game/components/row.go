@@ -1,29 +1,30 @@
-package design
+package components
 
 import (
+	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Row organiza widgets em uma linha, com espaçamento e altura opcional fixa
 // <USAR A ALTURA DO PAI PARA ALINHAMENTO NO EIXO SECUNDARIO (Y)>
 type Row struct {
-	Pos        Point   //posição inicial
-	Spacing    float32 //espaçamento horizontal entre elementos
+	Pos        basic.Point //posição inicial
+	Spacing    float32     //espaçamento horizontal entre elementos
 	Children   []Widget
-	MainAlign  Align // alinhamento dos elementos no eixo principal (center, start, end)
-	CrossAlign Align //eixo cruzado
-	size       Size  //para calculo de tamanho caso necessario
+	MainAlign  basic.Align // alinhamento dos elementos no eixo principal (center, start, end)
+	CrossAlign basic.Align //eixo cruzado
+	size       basic.Size  //para calculo de tamanho caso necessario
 }
 
 // NewRow cria uma linha e já calcula a posição de todos os widgets,
 // alinhando verticalmente e no eixo secundario de acordo com o alinhamento dado
 // construtor
 func NewRow(
-	pos Point,
+	pos basic.Point,
 	spacing float32,
-	parentSize Size,
-	mainAlign Align,
-	crossAlign Align,
+	parentSize basic.Size,
+	mainAlign basic.Align,
+	crossAlign basic.Align,
 	children []Widget,
 ) *Row {
 
@@ -39,15 +40,15 @@ func NewRow(
 	r.init()
 
 	// 2) se ambos Start, não faz nada
-	if mainAlign == Start && crossAlign == Start {
+	if mainAlign == basic.Start && crossAlign == basic.Start {
 		return r
 	}
 
 	// 3) aplica alinhamentos relativos ao retângulo do pai iniciado em r.Pos
-	if mainAlign != Start {
+	if mainAlign != basic.Start {
 		r.alignMain(parentSize)
 	}
-	if crossAlign != Start {
+	if crossAlign != basic.Start {
 		r.alignCross(parentSize)
 	}
 
@@ -61,7 +62,7 @@ func (r *Row) init() {
 	for _, w := range r.Children {
 		size := w.GetSize()
 
-		w.SetPos(Point{
+		w.SetPos(basic.Point{
 			X: cursorX,
 			Y: r.Pos.Y,
 		})
@@ -78,24 +79,30 @@ func (r *Row) Update() {
 	}
 }
 
-// Draw chama Draw de todos os filhos
+// Draw chama draw
 func (r *Row) Draw(screen *ebiten.Image) {
+	r.draw(screen, basic.Point{})
+}
+
+// draw chama draw de todos os filhos fazendo recursão com posição na arvore
+func (r *Row) draw(screen *ebiten.Image, offset basic.Point) {
+	final := r.Pos.Add(offset)
 	for _, w := range r.Children {
-		w.Draw(screen)
+		w.draw(screen, final)
 	}
 }
 
 // alinhamento no eixo principal (horizontal)
-func (r *Row) alignMain(parentSize Size) {
+func (r *Row) alignMain(parentSize basic.Size) {
 	content := r.GetSize()
 
 	var offsetX float32
 	switch r.MainAlign {
-	case Start:
+	case basic.Start:
 		return
-	case Center:
+	case basic.Center:
 		offsetX = (parentSize.W - content.W) / 2
-	case End:
+	case basic.End:
 		offsetX = parentSize.W - content.W
 	}
 
@@ -106,18 +113,19 @@ func (r *Row) alignMain(parentSize Size) {
 	}
 }
 
+// TODO: criar uma classe util de alinhamento caso tempo livre
 // alinhamento no eixo cruzado (vertical)
-func (r *Row) alignCross(parentSize Size) {
+func (r *Row) alignCross(parentSize basic.Size) {
 	for _, w := range r.Children {
 		size := w.GetSize()
 		p := w.GetPos()
 
 		switch r.CrossAlign {
-		case Start:
+		case basic.Start:
 			continue
-		case Center:
+		case basic.Center:
 			p.Y = r.Pos.Y + (parentSize.H-size.H)/2
-		case End:
+		case basic.End:
 			p.Y = r.Pos.Y + (parentSize.H - size.H)
 		}
 
@@ -143,18 +151,18 @@ func (r *Row) calcSize() {
 		}
 	}
 
-	r.size = Size{W: totalW, H: maxH}
+	r.size = basic.Size{W: totalW, H: maxH}
 }
 
-func (r *Row) GetPos() Point {
+func (r *Row) GetPos() basic.Point {
 	return r.Pos
 }
 
-func (r *Row) GetSize() Size {
+func (r *Row) GetSize() basic.Size {
 	return r.size
 }
 
-func (r *Row) SetSize(size Size) {
+func (r *Row) SetSize(_ basic.Size) {
 }
-func (r *Row) SetPos(point Point) {
+func (r *Row) SetPos(basic.Point) {
 }
