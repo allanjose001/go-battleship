@@ -2,9 +2,33 @@ package entity
 
 import "fmt"
 
+const BoardSize = 10
+
 type Board struct {
-	positions [10][10]Position
+	positions [BoardSize][BoardSize]Position
 }
+
+func (b *Board) AttackPosition(x int, y int) bool {
+	fmt.Printf("atacando %v,%v\n", x, y)
+	if CheckPosition(b, x, y) {
+		attack(&b.positions[x][y])
+
+		return true
+	}
+
+	return false
+}
+
+//func AttackPosition(b *Board, x int, y int) bool {
+//	fmt.Printf("atacando %v,%v\n", x, y)
+//	if CheckPosition(b, x, y) {
+//		attack(&b.positions[x][y])
+//
+//		return true
+//	}
+//
+//	return false
+//}
 
 func PlaceShip(b *Board, ship *Ship, x int, y int) bool {
 	if !CheckShipPosition(b, ship, x, y) {
