@@ -16,9 +16,9 @@ func _() *Fleet {
 	return fleet
 }
 
-func isFleetDestroyed(fleet *Fleet) bool {
+func (fleet *Fleet) isFleetDestroyed() bool {
 	for i := 0; i < 5; i++ {
-		if !isDestroyed(fleet.Ships[i]) { //se algum navio ainda não foi destruido
+		if !fleet.Ships[i].IsDestroyed() { //se algum navio ainda não foi destruido
 			return false //retorna falso
 		}
 	}
@@ -26,10 +26,10 @@ func isFleetDestroyed(fleet *Fleet) bool {
 	return true
 }
 
-func getFleetShips(Ships [5]*Ship) (ships []*Ship) {
-	return Ships[:]
+func (fleet *Fleet) getFleetShips() (ships []*Ship) {
+	return fleet.Ships[:]
 }
 
-func getShipByIndex(fleet *Fleet, index int) *Ship {
+func (fleet *Fleet) getShipByIndex(index int) *Ship {
 	return fleet.Ships[index]
 }

@@ -10,32 +10,21 @@ type Board struct {
 
 func (b *Board) AttackPosition(x int, y int) bool {
 	fmt.Printf("atacando %v,%v\n", x, y)
-	if CheckPosition(b, x, y) {
+	if b.CheckPosition(x, y) {
 		attack(&b.positions[x][y])
-
+		
 		return true
 	}
-
+	
 	return false
 }
 
-//func AttackPosition(b *Board, x int, y int) bool {
-//	fmt.Printf("atacando %v,%v\n", x, y)
-//	if CheckPosition(b, x, y) {
-//		attack(&b.positions[x][y])
-//
-//		return true
-//	}
-//
-//	return false
-//}
-
-func PlaceShip(b *Board, ship *Ship, x int, y int) bool {
-	if !CheckShipPosition(b, ship, x, y) {
+func (b *Board) PlaceShip(ship *Ship, x int, y int) bool {
+	if !b.CheckShipPosition(ship, x, y) {
 		return false
 	}
 
-	if isHorizontal(ship) {
+	if ship.isHorizontal() {
 		for i := y; i < y+ship.Size; i++ {
 			placeShip(&b.positions[x][i], ship)
 		}
@@ -49,7 +38,7 @@ func PlaceShip(b *Board, ship *Ship, x int, y int) bool {
 
 }
 
-func RemoveShipFromBoard(b *Board, ship *Ship) {
+func (b *Board) RemoveShipFromBoard(ship *Ship) {
 	for i := 0; i < 10; i++ {
 		for j := 0; j < 10; j++ {
 			var currentShip *Ship = getShipReference(b.positions[i][j])
@@ -64,19 +53,9 @@ func RemoveShipFromBoard(b *Board, ship *Ship) {
 	}
 }
 
-func AttackPosition(b *Board, x int, y int) bool {
-	fmt.Printf("atacando %v,%v\n", x, y)
-	if CheckPosition(b, x, y) {
-		attack(&b.positions[x][y])
 
-		return true
-	}
-
-	return false
-}
-
-func CheckShipPosition(b *Board, ship *Ship, x int, y int) bool {
-	if isHorizontal(ship) { //se o navio estiver na horizontal:
+func (b *Board) CheckShipPosition(ship *Ship, x int, y int) bool {
+	if ship.isHorizontal() { //se o navio estiver na horizontal:
 		if y+ship.Size > 10 { // verifica se o navio ultrapassa os limites do tabuleiro
 			return false
 		}
@@ -101,7 +80,7 @@ func CheckShipPosition(b *Board, ship *Ship, x int, y int) bool {
 	return true
 }
 
-func CheckPosition(b *Board, x int, y int) bool {
+func (b *Board) CheckPosition(x int, y int) bool {
 	if x < 0 || x > 9 || y < 0 || y > 9 {
 		return false
 	}

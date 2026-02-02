@@ -3,12 +3,12 @@ package main
 import (
 	//"gobattleship/UI"
 	//"fmt"
-	"log"
+	//"log"
 
 	"github.com/allanjose001/go-battleship/internal/ai"
 	"github.com/allanjose001/go-battleship/internal/entity"
 	"github.com/allanjose001/go-battleship/internal/service"
-  "github.com/allanjose001/go-battleship/game"
+ 	"github.com/allanjose001/go-battleship/game"
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -27,9 +27,9 @@ func main() {
 	barco2.Horizontal = false;
 
 
-	entity.PlaceShip(board1, barco1, 1, 1);
+	board1.PlaceShip(barco1, 1, 1)
 
-	entity.PlaceShip(board1, barco2, 5, 5);
+	board1.PlaceShip(barco2, 5, 5)
 
 	entity.PrintBoard(board1);
 
@@ -55,7 +55,7 @@ func main() {
 	profile1.MedalsEarned = 2
 
 	service.SaveProfile(*profile1);
-	err := service.SaveProfile(*profile1)
+	//err1 := service.SaveProfile(*profile1)
   
   //profile2, err := service.FindProfile("Player2");
 	//if err != nil {
