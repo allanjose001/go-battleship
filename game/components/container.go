@@ -10,6 +10,8 @@ import (
 )
 
 // Container retangulo que comporta um widget (tambem pode ser column ou row)
+// pode possuir bordas arredondadas ou não (colocar 0 em radius)
+// pode ter qualquer widget como child
 type Container struct {
 	Pos, currentPos basic.Point
 	Size            basic.Size
@@ -86,7 +88,7 @@ func (c *Container) SetSize(s basic.Size) {
 	c.Size = s
 }
 
-// alinhamento de child dentro do container
+// alignChild alinhamento de child dentro do container
 func (c *Container) alignChild() {
 	if c.Child == nil {
 		return
@@ -122,7 +124,7 @@ func (c *Container) alignChild() {
 // w e h podem ser 0 para usar tamanho padrão.
 // OnClick e OnHover podem ser nil.
 
-// DrawRoundedRect desenha um retangulo com borda arredondada
+// DrawRoundedRect desenha um retangulo com borda arredondada (opcional)
 func DrawRoundedRect(dst *ebiten.Image, pos basic.Point, size basic.Size, r float32, c color.Color) {
 	if c == nil { //nesse caso serve apenas para referencia de tamanho (semelhante a sizedbox)
 		c = colors.Transparent

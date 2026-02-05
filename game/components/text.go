@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-// Text widget que desenha texto com uma font.Face
+// Text widget que desenha texto com uma font.Face já definida e carregada no incio da run do jogo
 type Text struct {
 	Pos, currentPos basic.Point
 	Color           color.Color
@@ -57,7 +57,7 @@ func InitFonts() {
 	}
 }
 
-// Face Cria uma Face de um tamanho específico
+// createFace Cria uma Face de um tamanho específico
 func createFace(size float64) font.Face {
 	face, _ := opentype.NewFace(GoldmanFont, &opentype.FaceOptions{
 		Size:    size,
@@ -86,7 +86,6 @@ func (t *Text) updateSize() {
 }
 
 // Draw desenha componente com offset recebido em Update e somado a pos do Widget
-
 func (t *Text) Draw(screen *ebiten.Image) {
 
 	baseline := float32(t.face.Metrics().Ascent.Round())

@@ -10,14 +10,15 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+//Button struct que encapsula comportamento por meio de função callback, label, e um corpo que é um container
+//não é necessario preencher posição se estiver sendo alinhado em container, row ou column
 type Button struct {
-	pos, scaledPos             basic.Point
-	size, scaledSize           basic.Size
+	pos, currentPos            basic.Point
+	size                       basic.Size
 	label                      string
 	backgroundColor, textColor color.Color
 	CallBack                   func(*Button) //função que o botão chama
 	hoverColor                 color.Color
-	onHover                    func(*Button) //opcional
 	disabled, hovered, clicked bool
 	scale                      float32        // para animar click
 	body                       StylableWidget //um container por ex
@@ -29,14 +30,12 @@ func NewButton(
 	label string,
 	color color.Color,
 	textColor color.Color,
-	cb func(*Button), // ir para uma tela...
+	cb func(*Button),
 
 ) *Button {
 	bt := &Button{
 		pos:             pos,
-		scaledPos:       pos,
 		size:            size,
-		scaledSize:      size,
 		scale:           1.0,
 		label:           label,
 		backgroundColor: color,
@@ -61,27 +60,18 @@ func (b *Button) GetSize() basic.Size {
 	return b.size
 }
 
-func (b *Button) Update() {
+func (b *Button) Update(point basic.Point) {
 	mouseX, mouseY := ebiten.CursorPosition() //ver como fazer com disabled
 
+	b.currentPos = b.pos.Add(point)
+
 	//TODO: colocar som de hovered
-	b.hovered = inputhelper.IsHovered(mouseX, mouseY, b.pos, b.size)
+	b.hoverVerify(mouseX, mouseY)
 
 	b.clicked = inputhelper.IsClicked(mouseX, mouseY, b.pos, b.size)
 
-	//b.animateClick()
+	b.body.Update(b.currentPos)
 
-	/*//dispara callback do botão
-	if b.CallBack != nil &&inputhelper.IsClicked(mouseX, mouseY, b.pos, b.size) {
-		//b.CallBack(b)
-		println("clicked")
-		b.animateClick()
-	}*/
-
-}
-
-func (b *Button) Draw(screen *ebiten.Image) {
-	b.draw(screen, basic.Point{})
 }
 
 func (b *Button) SetSize(sz basic.Size) {
@@ -89,18 +79,11 @@ func (b *Button) SetSize(sz basic.Size) {
 	b.size = sz
 }
 
-func (b *Button) draw(screen *ebiten.Image, offset basic.Point) {
-	pos := b.pos.Add(offset)
-
-	if b.hovered {
-		b.body.SetColor(b.hoverColor)
-	} else {
-		b.body.SetColor(b.backgroundColor)
-	}
-
-	b.body.draw(screen, pos)
+func (b *Button) Draw(screen *ebiten.Image) {
+	b.body.Draw(screen)
 }
 
+//makeBody cria container com tamanho texto e cores designadas
 func (b *Button) makeBody() {
 
 	if b.textColor == nil {
@@ -126,37 +109,13 @@ func (b *Button) makeBody() {
 	)
 }
 
-/*
-func (b *Button) animateClick() {
-	//ifs para alterar escala do botão
-	if b.clicked {
-		b.scale += 0.1
-		if b.scale >= 1.2 {
-			b.scale = 1.2
-			b.clicked = false
-		}
+// Hover verifica se o mouse está sob o botão
+func (b *Button) hoverVerify(mouseX, mouseY int) {
+	b.hovered = inputhelper.IsHovered(mouseX, mouseY, b.pos, b.size)
+
+	if b.hovered {
+		b.body.SetColor(b.hoverColor)
 	} else {
-		if b.scale > 1.0 {
-			b.scale -= 0.05
-			if b.scale < 1.0 {
-				b.scale = 1.0
-			}
-		}
-	}
-
-	// aplica escala ao container mudando tamanho "scaled" escalando tamanho original com fator
-	b.SetSize(b.GetSize().Scale(b.scale))
-	b.body.SetPos(b.GetCenter(b.pos, b.size, b.scaledSize))
-
-}
-
-// GetCenter retorna centro do widget após escalar seu tamanho
-func (b *Button) GetCenter(originPos basic.Point, originSize, newSize basic.Size) basic.Point {
-	centerX := originPos.X + originSize.W/2
-	centerY := originPos.Y + originSize.H/2
-	return basic.Point{
-		X: centerX - newSize.W/2,
-		Y: centerY - newSize.H/2,
+		b.body.SetColor(b.backgroundColor)
 	}
 }
-*/
