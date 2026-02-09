@@ -1,10 +1,13 @@
 package ai
 
 import "github.com/allanjose001/go-battleship/internal/entity"
+import "fmt"
 
 type DiscoveryStrategy struct{}
 
 func (s *DiscoveryStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
+	fmt.Println("discoveryStrategy usada")
+
 	if ai.IsChasing() {
 		return false
 	}
@@ -13,8 +16,8 @@ func (s *DiscoveryStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
 	}
 
 	// Pega a primeira posição da fila de prioridade
-	x, y := ai.PopPriority()
-	ship := board.AttackPositionB(x, y)
-	ai.AdjustStrategy(board, x, y, ship)
+	row, col := ai.PopPriority()
+	ship := board.AttackPositionB(row, col)
+	ai.AdjustStrategy(board, row, col, ship)
 	return true
 }

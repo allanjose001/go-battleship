@@ -19,21 +19,21 @@ func (ai *AIPlayer) Attack(enemyBoard *entity.Board) {
 	}
 }
 
-func (ai *AIPlayer) AdjustStrategy(board *entity.Board, x, y int, ship *entity.Ship) {
+func (ai *AIPlayer) AdjustStrategy(board *entity.Board, row, y int, ship *entity.Ship) {
 	if ship == nil {
-		ai.virtualBoard[x][y] = 1
+		ai.virtualBoard[row][y] = 1
 		return
 	}
 
 	if ship.IsDestroyed() {
-		ai.virtualBoard[x][y] = 3
-		ai.WreckedShipAdjustment(board, x, y)
+		ai.virtualBoard[row][y] = 3
+		ai.WreckedShipAdjustment(board, row, y)
 		ai.ClearPriorityQueue()
 		ai.FleetShipDestroyed(ship.Size)
 		ai.StopChase()
 	} else {
-		ai.virtualBoard[x][y] = 2
-		ai.AttackNeighbors(x, y)
+		ai.virtualBoard[row][y] = 2
+		ai.AttackNeighbors(row, y)
 	}
 }
 
@@ -63,7 +63,6 @@ func (ai *AIPlayer) LocateShipStart(board *entity.Board, row, col int) (startRow
 	if ship == nil {
 		return row, col
 	}
-
 	startRow, startCol = row, col
 
 	if ship.IsHorizontal() {
@@ -200,14 +199,14 @@ func (ai *AIPlayer) IsValidForTesting(row, col int) bool {
 	return row >= 0 && row < 10 && col >= 0 && col < 10
 }
 
-func (ai *AIPlayer) PopPriority() (x, y int) {
+func (ai *AIPlayer) PopPriority() (row, y int) {
 	if len(ai.priorityQueue) == 0 {
 		return -1, -1
 	}
 
 	p := ai.priorityQueue[0]
 	ai.priorityQueue = ai.priorityQueue[1:]
-	return p.x, p.y
+	return p.row, p.col
 }
 
 func (ai *AIPlayer) StartChase() {

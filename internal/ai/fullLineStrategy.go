@@ -1,69 +1,78 @@
 package ai
 
-import "github.com/allanjose001/go-battleship/internal/entity"
+import (
+	"fmt"
 
-type FullLineStrategy struct {}
+	"github.com/allanjose001/go-battleship/internal/entity"
+)
+
+type FullLineStrategy struct{}
 
 func (s *FullLineStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
+	fmt.Println("fullLineStrategy usada")
+
 	if len(ai.priorityQueue) == 0 {
 		return false
 	}
-	x, y := ai.PopPriority()
-	ship := board.AttackPositionB(x, y)
-	ai.AdjustStrategy(board, x, y, ship)
+	row, col := ai.PopPriority()
+	ship := board.AttackPositionB(row, col)
+	ai.AdjustStrategy(board, row, col, ship)
 	if ship == nil || ship.IsDestroyed() {
 		return true
 	}
-	// Se acertou mas não destruiu, adiciona os próximos da linha na fila de prioridade
 
+	// Detecta orientação baseada em acertos anteriores
 	horizontal := false
 	vertical := false
-
-    if ai.IsValidForTesting(x, y-1) && ai.virtualBoard[x][y-1] == 2 { horizontal = true }
-    if ai.IsValidForTesting(x, y+1) && ai.virtualBoard[x][y+1] == 2 { horizontal = true }
-    if ai.IsValidForTesting(x-1, y) && ai.virtualBoard[x-1][y] == 2 { vertical = true }
-    if ai.IsValidForTesting(x+1, y) && ai.virtualBoard[x+1][y] == 2 { vertical = true }
+	if ai.IsValidForTesting(row, col-1) && ai.virtualBoard[row][col-1] == 2 { horizontal = true }
+	if ai.IsValidForTesting(row, col+1) && ai.virtualBoard[row][col+1] == 2 { horizontal = true }
+	if ai.IsValidForTesting(row-1, col) && ai.virtualBoard[row-1][col] == 2 { vertical = true }
+	if ai.IsValidForTesting(row+1, col) && ai.virtualBoard[row+1][col] == 2 { vertical = true }
 
 	ai.ClearPriorityQueue()
 
-    if horizontal {
-        // varre à esquerda
-        c := y // c de coluna(col)
-        for {
-            ny := c - 1
-            if !ai.IsValidForTesting(x, ny) || ai.virtualBoard[x][ny] != 0 { break }
-            ai.AddToPriorityQueue(x, ny)
-            c = ny
-        }
-        // varre à direita
-        c = y
-        for {
-            ny := c + 1
-            if !ai.IsValidForTesting(x, ny) || ai.virtualBoard[x][ny] != 0 { break }
-            ai.AddToPriorityQueue(x, ny)
-            c = ny
-        }
-        ai.StartChase()
-    } else if vertical {
-        r := x // r de linha(row)
-        for {
-            nx := r - 1
-            if !ai.IsValidForTesting(nx, y) || ai.virtualBoard[nx][y] != 0 { break }
-            ai.AddToPriorityQueue(nx, y)
-            r = nx
-        }
-        r = x
-        for {
-            nx := r + 1
-            if !ai.IsValidForTesting(nx, y) || ai.virtualBoard[nx][y] != 0 { break }
-            ai.AddToPriorityQueue(nx, y)
-            r = nx
-        }
-        ai.StartChase()
-    } else {
-        ai.AttackNeighbors(x, y)
-    }
-    return true
- 
+	if horizontal {
+		// encontra o bloco contíguo de acertos à esquerda
+		c := col
+		for ai.IsValidForTesting(row, c-1) && ai.virtualBoard[row][c-1] == 2 {
+			c--
+		}
+		// adiciona a célula imediatamente antes do bloco (se válida)
+		if ai.IsValid(row, c-1) {
+			ai.AddToPriorityQueue(row, c-1)
+		}
 
+		// encontra o bloco contíguo de acertos à direita
+		c = col
+		for ai.IsValidForTesting(row, c+1) && ai.virtualBoard[row][c+1] == 2 {
+			c++
+		}
+		// adiciona a célula imediatamente depois do bloco (se válida)
+		if ai.IsValid(row, c+1) {
+			ai.AddToPriorityQueue(row, c+1)
+		}
+
+		ai.StartChase()
+	} else if vertical {
+		r := row
+		for ai.IsValidForTesting(r-1, col) && ai.virtualBoard[r-1][col] == 2 {
+			r--
+		}
+		if ai.IsValid(r-1, col) {
+			ai.AddToPriorityQueue(r-1, col)
+		}
+
+		r = row
+		for ai.IsValidForTesting(r+1, col) && ai.virtualBoard[r+1][col] == 2 {
+			r++
+		}
+		if ai.IsValid(r+1, col) {
+			ai.AddToPriorityQueue(r+1, col)
+		}
+
+		ai.StartChase()
+	} else {
+		ai.AttackNeighbors(row, col)
+	}
+	return true
 }

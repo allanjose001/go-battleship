@@ -1,10 +1,13 @@
 package ai
 
 import "github.com/allanjose001/go-battleship/internal/entity"
+import "fmt"
 
 type StrategicSearchStrategy struct{}
 
 func (s *StrategicSearchStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
+	fmt.Println("strategicSearchStrategy usada")
+
     if len(ai.priorityQueue) != 0 {
         return false
     }
