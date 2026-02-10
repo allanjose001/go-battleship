@@ -23,6 +23,10 @@ type Column struct {
 	size basic.Size //caso necessario
 }
 
+func (c *Column) IsLayout() bool {
+	return true
+}
+
 // NewColumn cria uma coluna e já calcula a posição de todos os widgets
 // alinhando no eixo principal (vertical) e no eixo cruzado (horizontal)
 func NewColumn(

@@ -39,7 +39,6 @@ func (c *ComponentsTestScene) init1() {
 		basic.Center, //main -> x
 		basic.Center, //cross -> y
 		components.NewText(basic.Point{}, "BATTLESHIP", color.White, 48),
-		func(c *components.Container) {},
 	)
 
 	cont2 := components.NewContainer(
@@ -50,7 +49,6 @@ func (c *ComponentsTestScene) init1() {
 		basic.Start,  //main -> x
 		basic.Center, //cross -> y
 		contd,
-		func(c *components.Container) {},
 	)
 	c.containerTest = cont2
 
@@ -76,7 +74,6 @@ func (c *ComponentsTestScene) init2(size basic.Size) {
 				basic.Center, //main -> x
 				basic.Center, //cross -> y
 				components.NewText(basic.Point{}, "BATTLESHIP", color.White, 48),
-				func(c *components.Container) {},
 			),
 		},
 	)

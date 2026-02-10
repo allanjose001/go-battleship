@@ -17,6 +17,10 @@ type Row struct {
 	currentPos basic.Point
 }
 
+func (r *Row) IsLayout() bool {
+	return true
+}
+
 // NewRow cria uma linha e já calcula a posição de todos os widgets,
 // alinhando verticalmente e no eixo secundario de acordo com o alinhamento dado
 // construtor

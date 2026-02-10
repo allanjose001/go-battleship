@@ -15,9 +15,94 @@ type ExampleScene struct {
 
 func (e *ExampleScene) OnEnter(_ Scene, size basic.Size) {
 
-	//primeiro vou criar um alista de botões
+	//pode-se criar tudo um dentro do outro (para quem entende a "arvore de widgets")
+	/*e.row = *components.NewRow(
+		basic.Point{},
+		10.0,
+		size,
+		basic.Center,
+		basic.Center,
+		[]components.Widget{
+			components.NewContainer(
+				basic.Point{50, 50},
+				basic.Size{W: 0.8 * size.W, H: 0.8 * size.H},
+				10.0,
+				colors.Dark,
+				basic.Center, //funciona com filho "unico"
+				basic.Center,
+				components.NewColumn(
+					basic.Point{}, //POSIÇÃO EM RELAÇÃO AO PAI !
+					10.0,
+					basic.Size{W: 0.8 * size.W, H: 0.8 * size.H},
+					basic.Center,
+					basic.Center,
+					[]components.Widget{
+						components.NewText(
+							basic.Point{},
+							"Teste dos Buttons",
+							colors.White,
+							40,
+						),
+						components.NewContainer( //aqui eu uso container apenas para ocupar espaço
+							basic.Point{},
+							basic.Size{H: 70, W: 1},
+							0.0,
+							colors.Transparent,
+							basic.Center,
+							basic.Center,
+							nil,
+						),
 
+						components.NewButton(
+							basic.Point{},
+							basic.Size{W: 400, H: 70},
+							"botão x",
+							colors.Green,
+							nil,
+							func(b *components.Button) {},
+						),
+						components.NewButton(
+							basic.Point{},
+							basic.Size{W: 400, H: 70},
+							"botão x",
+							colors.Green,
+							nil,
+							func(b *components.Button) {},
+						),
+						components.NewButton(
+							basic.Point{},
+							basic.Size{W: 400, H: 70},
+							"botão x",
+							colors.Green,
+							nil,
+							func(b *components.Button) {},
+						),
+					},
+				),
+			),
+		},
+	)*/
+
+	//ou pode-se criar tudo separadamente assim:
+
+	//crio botões em uma lista
 	buttons := []components.Widget{
+		components.NewText(
+			basic.Point{},
+			"Teste dos Buttons",
+			colors.White,
+			40,
+		),
+		components.NewContainer( //aqui eu uso container apenas para ocupar espaço
+			basic.Point{},
+			basic.Size{H: 70, W: 1},
+			0.0,
+			colors.Transparent,
+			basic.Center,
+			basic.Center,
+			nil,
+		),
+
 		components.NewButton(
 			basic.Point{},
 			basic.Size{W: 400, H: 70},
@@ -44,35 +129,37 @@ func (e *ExampleScene) OnEnter(_ Scene, size basic.Size) {
 		),
 	}
 
-	e.container = components.NewContainer(
-		basic.Point{50, 50},
-		basic.Size{W: 0.8 * size.W, H: 0.8 * size.H},
-		10.0,
-		colors.White,
-		basic.Center, //funciona com filho "unico"
-		basic.Center,
-		&e.col,
-		func(c *components.Container) {},
-	)
+	containerSize := basic.Size{W: 0.8 * size.W, H: 0.8 * size.H} //dado que col deve ter tamanho do pai
+
 	e.col = *components.NewColumn(
 		basic.Point{}, //POSIÇÃO EM RELAÇÃO AO PAI !
 		10.0,
-		basic.Size{W: 0.8 * size.W, H: 0.8 * size.H},
+		containerSize, //tamanho do pai
 		basic.Center,
 		basic.Center,
 		buttons,
 	)
+	e.container = components.NewContainer(
+		basic.Point{50, 50},
+		containerSize, //pai com seu tamanho
+		10.0,
+		colors.Dark,
+		basic.End, //funciona quando filho não é layout (col  e row)
+		basic.Start,
+		&e.col,
+	)
 
-	/*e.row = *components.NewRow(
+	//usado para alinhar o container na tela
+	e.row = *components.NewRow(
 		basic.Point{},
 		10.0,
-		size,
+		size, //tamanho total da tela
 		basic.Center,
 		basic.Center,
 		[]components.Widget{
 			e.container,
 		},
-	)*/
+	)
 
 }
 
@@ -80,10 +167,10 @@ func (e *ExampleScene) OnExit(_ Scene) {
 }
 
 func (e *ExampleScene) Update() error {
-	e.container.Update(basic.Point{})
+	e.row.Update(basic.Point{})
 	return nil
 }
 
 func (e *ExampleScene) Draw(screen *ebiten.Image) {
-	e.container.Draw(screen)
+	e.row.Draw(screen)
 }

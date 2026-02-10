@@ -105,9 +105,6 @@ func (b *Button) makeBody() {
 			b.textColor,
 			18, //VER SE ESSA FONTE DA
 		),
-		func(c *Container) {
-			//fazer aqui relação com callback
-		},
 	)
 }
 
