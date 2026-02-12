@@ -1,13 +1,17 @@
 package scenes
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/allanjose001/go-battleship/game/components/basic"
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 // Scene define o contrato básico que toda tela do jogo deve seguir.
 type Scene interface {
 	// OnEnter é chamado quando esta cena passa a ser a cena ativa.
 	// Serve para inicializar estados visuais e carregar dados necessários. -> como init do flutter
 	// prev pode ser nil caso seja a primeira cena do jogo.
-	OnEnter(prev Scene)
+	//passa também o tamanho da tela (anterior?)
+	OnEnter(prev Scene, size basic.Size)
 
 	// OnExit é chamado antes de trocar para outra cena.
 	// Serve para limpar estados temporários (ex: cancelar drag, animações). -> dispose do flutter
@@ -17,6 +21,8 @@ type Scene interface {
 	// Update é chamado a cada frame.
 	// Deve tratar input, atualizar animações e chamar a lógica do jogo.
 	// Não deve desenhar nada na tela.
+	//sempre o update dos componentes da scene será dado um ponto vazio
+	//(ver widget)
 	Update() error
 
 	// Draw é chamado a cada frame após o Update.
