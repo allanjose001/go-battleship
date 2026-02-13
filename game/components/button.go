@@ -11,9 +11,11 @@ import (
 )
 
 // Button struct que encapsula comportamento por meio de função callback, label, e um corpo que é um container
+// não é necessario preencher posição se estiver sendo alinhado em container, row ou column
 // a posição é relativa a seu pai (ex: caso va alinhar (usar algo como center - center) e queira que siga seu
 // alinhamento, deixe em 0,0, caso queira mexer, ficará deslocado na posição alinhada + o valor da pos,
 // como se começasse na posição do pai)
+
 type Button struct {
 	pos, currentPos            basic.Point //POSIÇÃO RELATIVA AO PAI VS POSIÇÃO ATUAL NA TELA COMO UM TOD0 !
 	size                       basic.Size
@@ -72,8 +74,6 @@ func (b *Button) Update(point basic.Point) {
 
 	b.hoverVerify(mouseX, mouseY)
 
-	b.clickVerify(mouseX, mouseY)
-
 	if b.clicked {
 		if b.CallBack != nil {
 			b.CallBack(b)
@@ -85,6 +85,15 @@ func (b *Button) Update(point basic.Point) {
 func (b *Button) SetSize(sz basic.Size) {
 	b.body.SetSize(sz)
 	b.size = sz
+}
+
+func (b *Button) SetDisabled(disabled bool) {
+	b.disabled = disabled
+	if disabled {
+		b.body.SetColor(color.RGBA{128, 128, 128, 255}) // Cinza se desativado
+	} else {
+		b.body.SetColor(b.backgroundColor)
+	}
 }
 
 func (b *Button) Draw(screen *ebiten.Image) {
@@ -116,6 +125,7 @@ func (b *Button) makeBody() {
 
 // Hover verifica se o mouse está sob o botão
 func (b *Button) hoverVerify(mouseX, mouseY int) {
+
 	b.hovered = inputhelper.IsHovered(mouseX, mouseY, b.currentPos, b.size)
 
 	if b.hovered {
