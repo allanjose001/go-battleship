@@ -39,26 +39,24 @@ func main() {
 
 	board1.PlaceShip(fleet1.GetShipByIndex(0), 1, 1)
 	board1.PlaceShip(fleet1.GetShipByIndex(1), 4, 4)
+	fleet1.GetShipByIndex(2).Rotate()
+	board1.PlaceShip(fleet1.GetShipByIndex(2), 7, 7)
+	fleet1.GetShipByIndex(3).Rotate()
+	board1.PlaceShip(fleet1.GetShipByIndex(3), 5, 1)
+	board1.PlaceShip(fleet1.GetShipByIndex(4), 6, 4)
 
 	entity.PrintBoard(board1);
 	
 	//========= teste AI ===========
 	
 	//aiPlayer := ai.NewEasyAIPlayer();
-	aiPlayer := ai.NewMediumAIPlayer(fleet1);
+	//aiPlayer := ai.NewMediumAIPlayer(fleet1);
+	aiPlayer := ai.NewHardAIPlayer(fleet1);
 
+	for i := 0; i < 50; i++ {
 	aiPlayer.Attack(board1);
-	aiPlayer.Attack(board1);
-	aiPlayer.Attack(board1);
-	aiPlayer.Attack(board1);
-	aiPlayer.Attack(board1);
-	aiPlayer.Attack(board1);
-	aiPlayer.Attack(board1);
-	aiPlayer.Attack(board1);
-	aiPlayer.Attack(board1);
-		
-
 	entity.PrintBoard(board1);
+	}
 
 	//========== teste de profile ===========
 
