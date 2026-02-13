@@ -102,8 +102,8 @@ func (r *Row) alignMain(parentSize basic.Size) {
 
 	for _, w := range r.Children {
 		p := w.GetPos()
-		// mantém o deslocamento relativo original dentro da Row
-		p.X = r.Pos.X + (p.X - r.Pos.X) + offsetX
+		// mantém o deslocamento relativo original dentro da Row e adiciona o offset calculado
+		p.X = p.X + offsetX
 		w.SetPos(p)
 	}
 }
@@ -116,12 +116,12 @@ func (r *Row) alignCross(parentSize basic.Size) {
 
 		switch r.CrossAlign {
 		case basic.Start:
-			// mantém o Y relativo original
+			p.Y = 0
 		case basic.Center:
 			// centraliza verticalmente relativo à Row
-			p.Y = r.Pos.Y + (parentSize.H-size.H)/2
+			p.Y = (parentSize.H - size.H) / 2
 		case basic.End:
-			p.Y = r.Pos.Y + (parentSize.H - size.H)
+			p.Y = parentSize.H - size.H
 		}
 
 		w.SetPos(p)

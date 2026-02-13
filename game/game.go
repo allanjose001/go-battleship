@@ -8,17 +8,32 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var windowSize = basic.Size{W: 1280, H: 720}
+var windowSize = basic.Size{W: 1280, H: 800}
+
+var currentGame *Game
 
 type Game struct {
 	scene scenes.Scene
 }
 
-func NewGame() *Game {
-	g := &Game{
-		scene: &scenes.ButtonScene{},
+func ChangeScene(s scenes.Scene) {
+	if currentGame != nil {
+		if currentGame.scene != nil {
+			currentGame.scene.OnExit(s)
+		}
+		prev := currentGame.scene
+		currentGame.scene = s
+		currentGame.scene.OnEnter(prev, windowSize)
 	}
-	g.scene.OnEnter(nil, windowSize) //escolher o teste no OnEnter dessa struct
+}
+
+func NewGame() *Game {
+	scenes.SwitchTo = ChangeScene
+	g := &Game{
+		scene: &scenes.PlacementScene{}, // Start with PlacementScene
+	}
+	currentGame = g
+	g.scene.OnEnter(nil, windowSize)
 	return g
 }
 func (g *Game) Update() error {
@@ -27,7 +42,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{R: 30, G: 30, B: 30, A: 255})
+	screen.Fill(color.RGBA{R: 13, G: 27, B: 42, A: 255})
 	g.scene.Draw(screen)
 }
 
