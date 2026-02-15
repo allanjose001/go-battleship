@@ -11,18 +11,16 @@ import (
 )
 
 // Button struct que encapsula comportamento por meio de função callback, label, e um corpo que é um container
-// não é necessario preencher posição se estiver sendo alinhado em container, row ou column
 // a posição é relativa a seu pai (ex: caso va alinhar (usar algo como center - center) e queira que siga seu
 // alinhamento, deixe em 0,0, caso queira mexer, ficará deslocado na posição alinhada + o valor da pos,
 // como se começasse na posição do pai)
-
 type Button struct {
 	pos, currentPos            basic.Point //POSIÇÃO RELATIVA AO PAI VS POSIÇÃO ATUAL NA TELA COMO UM TOD0 !
 	size                       basic.Size
 	label                      string
 	backgroundColor, textColor color.Color
 	CallBack                   func(*Button) //função que o botão chama
-	hoverColor                 color.Color
+	hoverColor, disabledColor  color.Color
 	disabled, hovered, clicked bool
 	scale                      float32        // para animar click
 	body                       StylableWidget //um container por ex
@@ -46,12 +44,26 @@ func NewButton(
 		textColor:       textColor,
 		CallBack:        cb,
 		hoverColor:      colors.Lighten(color, 0.25),
+		disabledColor:   colors.GrayOut(color, 0.35),
 	}
 
 	bt.makeBody() //cria body com container e variaveis de button
 
 	return bt
 }
+
+// ToggleDisabled habilita/desabilita botão e setta devida cor
+func (b *Button) ToggleDisabled() {
+	b.disabled = !b.disabled
+
+	if b.disabled {
+		b.body.SetColor(b.disabledColor)
+	} else {
+		b.body.SetColor(b.backgroundColor)
+	}
+
+}
+
 func (b *Button) GetPos() basic.Point {
 	return b.pos
 }
@@ -65,35 +77,24 @@ func (b *Button) GetSize() basic.Size {
 }
 
 func (b *Button) Update(point basic.Point) {
+	if b.disabled {
+		return
+	}
+
 	mouseX, mouseY := ebiten.CursorPosition() //ver como fazer com disabled
 
 	b.currentPos = b.pos.Add(point)
 
-	//TODO: colocar som de hovered
 	b.body.Update(b.currentPos)
 
+	//TODO: colocar som de hovered
 	b.hoverVerify(mouseX, mouseY)
-
-	if b.clicked {
-		if b.CallBack != nil {
-			b.CallBack(b)
-		}
-	}
-
+	b.clickVerify(mouseX, mouseY)
 }
 
 func (b *Button) SetSize(sz basic.Size) {
 	b.body.SetSize(sz)
 	b.size = sz
-}
-
-func (b *Button) SetDisabled(disabled bool) {
-	b.disabled = disabled
-	if disabled {
-		b.body.SetColor(color.RGBA{128, 128, 128, 255}) // Cinza se desativado
-	} else {
-		b.body.SetColor(b.backgroundColor)
-	}
 }
 
 func (b *Button) Draw(screen *ebiten.Image) {
@@ -123,9 +124,8 @@ func (b *Button) makeBody() {
 	)
 }
 
-// Hover verifica se o mouse está sob o botão
+// Hover verifica se o mouse está sob o botão e muda cor do botão caso sim
 func (b *Button) hoverVerify(mouseX, mouseY int) {
-
 	b.hovered = inputhelper.IsHovered(mouseX, mouseY, b.currentPos, b.size)
 
 	if b.hovered {
@@ -135,6 +135,7 @@ func (b *Button) hoverVerify(mouseX, mouseY int) {
 	}
 }
 
+// clickVerify verifica se botão foi clickado e chama CallBack caso sim
 func (b *Button) clickVerify(mouseX, mouseY int) {
 	b.clicked = inputhelper.IsClicked(mouseX, mouseY, b.currentPos, b.GetSize())
 
