@@ -1,10 +1,10 @@
 package scenes
 
 import (
-	"github.com/allanjose001/go-battleship/UI"
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
+	"github.com/allanjose001/go-battleship/internal/ai"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -12,41 +12,33 @@ type DifficultyMenu struct {
 	layout components.Widget
 }
 
-func NewDifficultyMenu() *DifficultyMenu {
-	// Tamanho dos botões baseado no seu rascunho
+func NewDifficultyMenu(w, h int, onSelect func(player *ai.AIPlayer)) *DifficultyMenu {
 	btnSize := basic.Size{W: 220, H: 60}
 
-	// Criando os botões com a nomenclatura intuitiva
 	btnRecruta := components.NewButton(basic.Point{}, btnSize, "Recruta", colors.Blue, colors.White, func(b *components.Button) {
-		// Callback para nível Fácil
+		onSelect(ai.NewEasyAIPlayer())
 	})
 
 	btnImediato := components.NewButton(basic.Point{}, btnSize, "Imediato", colors.Blue, colors.White, func(b *components.Button) {
-		// Callback para nível Médio
+		onSelect(ai.NewMediumAIPlayer(nil))
 	})
 
 	btnAlmirante := components.NewButton(basic.Point{}, btnSize, "Almirante", colors.Blue, colors.White, func(b *components.Button) {
-		// Callback para nível Difícil
+		onSelect(ai.NewHardAIPlayer(nil))
 	})
 
-	// Referenciando as constantes exportadas (ScreenWidth/ScreenHeight) do pacote UI
-	screenSize := basic.Size{W: float32(UI.ScreenWidth), H: float32(UI.ScreenHeight)}
-
-	// Organização vertical centralizada
+	screenSize := basic.Size{W: float32(w), H: float32(h)}
 	column := components.NewColumn(
 		basic.Point{X: 0, Y: 0},
-		25, // Spacing
+		25,
 		screenSize,
 		basic.Center,
 		basic.Center,
 		[]components.Widget{
 			components.NewText(basic.Point{}, "SELECIONE SUA PATENTE", colors.White, 28),
-			btnRecruta,
-			btnImediato,
-			btnAlmirante,
+			btnRecruta, btnImediato, btnAlmirante,
 		},
 	)
-
 	return &DifficultyMenu{layout: column}
 }
 
@@ -60,6 +52,4 @@ func (m *DifficultyMenu) Draw(screen *ebiten.Image) {
 	m.layout.Draw(screen)
 }
 
-func (m *DifficultyMenu) Layout(w, h int) (int, int) {
-	return w, h
-}
+func (m *DifficultyMenu) Layout(w, h int) (int, int) { return w, h }
