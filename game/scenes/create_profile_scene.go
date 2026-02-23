@@ -10,9 +10,10 @@ import (
 )
 
 type CreateProfileScene struct {
-	root      components.Widget
-	nameField *components.TextField
-	errorText *components.Text
+	root       components.Widget
+	nameField  *components.TextField
+	errorText  *components.Text
+	saveButton *components.Button
 	StackHandler
 }
 
@@ -45,13 +46,11 @@ func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 		colors.Dark,
 		nil,
 		func(b *components.Button) {
-			if SwitchTo != nil {
-				SwitchTo(&SelectProfileScene{})
-			}
+			s.stack.Pop()
 		},
 	)
 
-	saveButton := components.NewButton(
+	s.saveButton = components.NewButton(
 		basic.Point{},
 		basic.Size{W: 200, H: 55},
 		"salvar",
@@ -59,10 +58,6 @@ func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 		nil,
 		func(b *components.Button) {
 			username := s.nameField.Text
-			if username == "" {
-				s.errorText.Text = "Nome não pode ser vazio"
-				return
-			}
 
 			profile := entity.Profile{
 				Username: username,
@@ -73,23 +68,25 @@ func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 				s.errorText.Text = "Erro ao salvar perfil"
 				return
 			}
-
-			if SwitchTo != nil {
-				SwitchTo(&SelectProfileScene{})
-			}
+			s.stack.Pop()
 		},
 	)
 
-	buttonRow := components.NewRow(
+	buttonRow := components.NewContainer(
 		basic.Point{},
-		40,
-		basic.Size{W: size.W, H: 80},
-		basic.Center,
-		basic.Center,
-		[]components.Widget{
-			backButton,
-			saveButton,
-		},
+		basic.Size{W: size.W * 0.55, H: 50},
+		0, colors.Transparent,
+		basic.Center, basic.Center,
+		components.NewRow(
+			basic.Point{},
+			40, basic.Size{W: size.W * 0.55, H: 50},
+			basic.Center,
+			basic.Center,
+			[]components.Widget{
+				backButton,
+				s.saveButton,
+			},
+		),
 	)
 
 	s.root = components.NewColumn(
@@ -101,7 +98,13 @@ func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 		[]components.Widget{
 			label,
 			s.nameField,
-			s.errorText,
+			components.NewContainer(
+				basic.Point{},
+				basic.Size{W: size.W * 0.55, H: 40},
+				0, colors.Transparent,
+				basic.Center, basic.Center,
+				s.errorText,
+			),
 			buttonRow,
 		},
 	)
@@ -110,6 +113,7 @@ func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 func (s *CreateProfileScene) OnExit(next Scene) {}
 
 func (s *CreateProfileScene) Update() error {
+	s.saveButton.SetDisabled(s.nameField.Text == "")
 	if s.root != nil {
 		s.root.Update(basic.Point{})
 	}
