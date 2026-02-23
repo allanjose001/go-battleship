@@ -38,7 +38,7 @@ func (s *PlayerStats) ApplyMatch(r MatchResult) {
 		s.Wins++
 	}
 
-	s.TotalShots += r.ShotsFired
+	s.TotalShots += r.PlayerShots
 
 	s.TotalHits += r.Hits
 

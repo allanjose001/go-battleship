@@ -2,10 +2,10 @@ package entity
 
 import "fmt"
 
-// MatchResult struct que encapsula resultado da partida para histórico e etsatisticas do jg
+// MatchResult struct que encapsula resultado da partida para histórico e estatisticas do jogo
 type MatchResult struct {
 	Win               bool  `json:"win"`
-	ShotsFired        int   `json:"shots_fired"`
+	PlayerShots       int   `json:"player_shots"`
 	Hits              int   `json:"hits"`
 	HigherHitSequence int   `json:"higher_hit_sequence"`
 	Score             int   `json:"score"`
@@ -17,8 +17,8 @@ type MatchResult struct {
 // FormattedDuration retorna string para ser usada no front
 func (m MatchResult) FormattedDuration() string {
 	totalSec := m.Duration / 1000
-	min := totalSec / 60
+	minute := totalSec / 60
 	sec := totalSec % 60
 
-	return fmt.Sprintf("%02d:%02d", min, sec)
+	return fmt.Sprintf("%02d:%02d", minute, sec)
 }
