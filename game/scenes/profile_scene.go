@@ -53,9 +53,10 @@ func (p *ProfileScene) init(size basic.Size) {
 				basic.Point{},
 				//TODO: Criar o tipo datastats para facilitar isso, e facilitar carregar/salvar no json em profile
 				size, //usa tamanho da tela para caso mude a resolução
-				2999, 200, 90000, 62, 80,
+				2999, 200, 90000, 12, 62, 80,
 				false, //para reutilizar em ranking
 				playerName,
+				0,
 			),
 			//medalhas
 			components.NewText(basic.Point{}, "MURAL DE MEDALHAS", colors.White, 28),
