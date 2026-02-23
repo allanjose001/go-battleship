@@ -77,6 +77,7 @@ func (p *ProfileScene) init(size basic.Size) {
 				func(b *components.Button) {
 					p.stack.Pop()
 				},
+
 			),
 		},
 	)
