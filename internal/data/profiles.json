@@ -7,13 +7,47 @@
       "total_shots": 0,
       "total_hits": 0,
       "high_score": 0,
-      "higher_sequence": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
       "faster_time": 0,
       "win_without_losses": false
     },
     "medals": [
       "Marinheiro",
       "Capitão"
-    ]
+    ],
+    "history": null
+  },
+  {
+    "username": "malub",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  },
+  {
+    "username": "maria ",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
   }
 ]

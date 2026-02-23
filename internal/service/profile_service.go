@@ -10,7 +10,7 @@ import (
 	"github.com/allanjose001/go-battleship/internal/medal"
 )
 
-const defaultPath string = "internal/service/saves/profiles.json"
+const defaultPath string = "internal/data/profiles.json"
 
 var profiles []entity.Profile
 

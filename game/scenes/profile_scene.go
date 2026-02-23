@@ -82,11 +82,7 @@ func (p *ProfileScene) init(size basic.Size) {
 				"Retornar",
 				colors.Dark,
 				colors.White,
-				func(b *components.Button) {
-					if SwitchTo != nil {
-						SwitchTo(&SelectProfileScene{})
-					}
-				},
+				func(b *components.Button) {},
 			),
 		},
 	)
