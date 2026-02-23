@@ -50,16 +50,21 @@ func NewButton(
 	return bt
 }
 
-// ToggleDisabled habilita/desabilita botão e setta devida cor
-func (b *Button) ToggleDisabled() {
-	b.disabled = !b.disabled
+// SetDisabled habilita ou desabilita o botão e atualiza a cor visual imediatamente
+// Segue o mesmo padrão do hoverVerify - altera estado e aplica cor correspondente
+func (b *Button) SetDisabled(disabled bool) {
+	if b.disabled == disabled {
+		return // evita reprocessar se o estado não mudou
+	}
 
+	b.disabled = disabled
+
+	// Aplica a cor imediatamente, igual ao padrão do hover
 	if b.disabled {
 		b.body.SetColor(b.disabledColor)
 	} else {
 		b.body.SetColor(b.backgroundColor)
 	}
-
 }
 
 func (b *Button) GetPos() basic.Point {
@@ -75,15 +80,15 @@ func (b *Button) GetSize() basic.Size {
 }
 
 func (b *Button) Update(point basic.Point) {
+	b.currentPos = b.pos.Add(point)
+
+	b.body.Update(b.currentPos)
+
 	if b.disabled {
 		return
 	}
 
 	mouseX, mouseY := ebiten.CursorPosition() //ver como fazer com disabled
-
-	b.currentPos = b.pos.Add(point)
-
-	b.body.Update(b.currentPos)
 
 	//TODO: colocar som de hovered
 	b.hoverVerify(mouseX, mouseY)

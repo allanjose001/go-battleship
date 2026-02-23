@@ -12,26 +12,18 @@ import (
 // ProfileScene representa a tela de perfil do jogador.
 type ProfileScene struct {
 	state   *state.GameState
-	profile *entity.Profile
+	profile *entity.Profile    //TODO: SUBSTITUIR OS ACESSOS A ISSO PELO CONTEXT E APAGAR FIELD
 	root    *components.Column // O container pai que envolve toda a cena.
-}
-
-func NewProfileSceneWithProfile(p *entity.Profile) *ProfileScene {
-	return &ProfileScene{
-		profile: p,
-	}
+	StackHandler
 }
 
 // init Funcão que inicializa componentes
 func (p *ProfileScene) init(size basic.Size) {
+	//TODO: CHAMA CONTEXT AQUI
 	playerName := "Nome do player aqui"
-	if p.profile != nil && p.profile.Username != "" {
-		playerName = p.profile.Username
-	}
+	//playerName = ctx.Player.Username
 
 	medals := loadMedals()
-
-	///TODO: Criar componente medal (ver se precisa back e front)
 
 	// Coluna principal que centraliza verticalmente
 	p.root = components.NewColumn(
@@ -79,13 +71,11 @@ func (p *ProfileScene) init(size basic.Size) {
 			components.NewButton(
 				basic.Point{},
 				basic.Size{220, 55},
-				"Retornar",
+				"Voltar",
 				colors.Dark,
 				colors.White,
 				func(b *components.Button) {
-					if SwitchTo != nil {
-						SwitchTo(&SelectProfileScene{})
-					}
+					p.stack.Pop()
 				},
 			),
 		},
