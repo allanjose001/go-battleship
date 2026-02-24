@@ -1,5 +1,6 @@
 package UI
 
+/*
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -21,4 +22,4 @@ func Run() error {
     ebiten.SetWindowSize(screenWidth, screenHeight)
     ebiten.SetWindowTitle("Battleship - Preview")
     return ebiten.RunGame(NewApp())
-}
+}*/
