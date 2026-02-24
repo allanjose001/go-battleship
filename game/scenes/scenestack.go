@@ -2,6 +2,7 @@ package scenes
 
 import (
 	"github.com/allanjose001/go-battleship/game/components/basic"
+	"github.com/allanjose001/go-battleship/game/state"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/allanjose001/go-battleship/game/state"
 )

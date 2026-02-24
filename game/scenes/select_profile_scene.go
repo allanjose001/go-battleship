@@ -131,7 +131,7 @@ func (s *SelectProfileScene) buildProfileRows(width float32, parentSize basic.Si
 	iconSize := basic.Size{W: 45, H: 45}
 
 	for i, p := range s.profiles {
-		rows[i] = s.createProfileRow(p, width, iconSize)
+		rows[i] = s.createProfileRow(&p, width, iconSize)
 	}
 
 	return components.NewColumn(
@@ -145,7 +145,7 @@ func (s *SelectProfileScene) buildProfileRows(width float32, parentSize basic.Si
 }
 
 // createProfileRow cria uma única linha de perfil
-func (s *SelectProfileScene) createProfileRow(p entity.Profile, width float32, iconSize basic.Size) components.Widget {
+func (s *SelectProfileScene) createProfileRow(p *entity.Profile, width float32, iconSize basic.Size) components.Widget {
 	// Captura o perfil para o closure
 	profile := p
 
@@ -157,8 +157,7 @@ func (s *SelectProfileScene) createProfileRow(p entity.Profile, width float32, i
 		colors.PlayerInput,
 		nil,
 		func(b *components.Button) {
-			//TODO: CONTEXT RECEBE PLAYER SELECIONADO
-			//s.ctx.Profile = p
+			s.ctx.Profile = p
 			s.stack.Push(&ProfileScene{})
 
 		},
@@ -175,9 +174,7 @@ func (s *SelectProfileScene) createProfileRow(p entity.Profile, width float32, i
 
 	// Ícone de jogar
 	playBtn := components.NewPlayIconButton(basic.Point{}, iconSize, func() {
-
-		//TODO: CONTEXT -> daqui pra tela de seleção de modo
-		//s.ctx.Profile = p
+		s.ctx.Profile = p
 		s.stack.Push(&PlacementScene{})
 	})
 

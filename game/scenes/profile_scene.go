@@ -5,23 +5,20 @@ import (
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
 	"github.com/allanjose001/go-battleship/game/state"
-	"github.com/allanjose001/go-battleship/internal/entity"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // ProfileScene representa a tela de perfil do jogador.
 type ProfileScene struct {
-	state   *state.GameState
-	profile *entity.Profile    //TODO: SUBSTITUIR OS ACESSOS A ISSO PELO CONTEXT E APAGAR FIELD
-	root    *components.Column // O container pai que envolve toda a cena.
+	state *state.GameState
+	root  *components.Column // O container pai que envolve toda a cena.
 	StackHandler
 }
 
 // init Funcão que inicializa componentes
 func (p *ProfileScene) init(size basic.Size) {
-	//TODO: CHAMA CONTEXT AQUI
-	playerName := "Nome do player aqui"
-	//playerName = ctx.Player.Username
+
+	playerName := p.ctx.Profile.Username
 
 	medals := loadMedals()
 
@@ -43,9 +40,8 @@ func (p *ProfileScene) init(size basic.Size) {
 			//Container com Row para estatisticas
 			components.NewStatCard(
 				basic.Point{},
-				//TODO: Criar o tipo datastats para facilitar isso, e facilitar carregar/salvar no json em profile
 				size, //usa tamanho da tela para caso mude a resolução
-				2999, 200, 90000, 12, 62, 80,
+				&p.ctx.Profile.Stats,
 				false, //para reutilizar em ranking
 				playerName,
 				0,
@@ -71,20 +67,20 @@ func (p *ProfileScene) init(size basic.Size) {
 
 			components.NewButton(
 				basic.Point{},
-				basic.Size{220, 55},
+				basic.Size{W: 220, H: 55},
 				"Voltar",
 				colors.Dark,
 				colors.White,
 				func(b *components.Button) {
 					p.stack.Pop()
 				},
-
 			),
 		},
 	)
 }
 
-// TODO: Criar isso no ProfileService para carregar de um arquivo contendo as medals -> aqui transforma em widget
+// TODO: CARREGAR TODAS MEDALHAS E FAZER LOGICA DE MEDALHAS CONQUISTADAS X NAO CONQUISTADAS (CONTEXT POSSUI CONQUISTADAS)
+// TODO: MUDAR MEDAL E MEDALCARD PARA NOVO TIPO MEDAL
 func loadMedals() *[]components.Widget {
 	medalData := []struct { // isso aqui pode ser as medals carregadas do json
 		Icon, Title, Desc string
