@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/allanjose001/go-battleship/game/components"
@@ -45,7 +46,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 	homeImage, err := components.NewImage(
 		"assets/images/home-screen.png",
 		basic.Point{},
-		basic.Size{W: 580, H: 400})
+		basic.Size{W: 500, H: 500})
 
 	if err != nil {
 		return err
@@ -53,7 +54,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 	m.layout = components.NewColumn(
 		basic.Point{},
 		20,
-		basic.Size{W: screenSize.W, H: screenSize.H},
+		screenSize,
 		basic.Center,
 		basic.Center,
 		[]components.Widget{
@@ -65,6 +66,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
+					//TODO: ainda sera para scene de modo de jogo
 					m.stack.Push(&DifficultyScene{})
 				},
 			),
@@ -76,8 +78,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
-					//m.stack.Push() //TODO: ir para tela de Ranking
-					log.Println("Botão clicado!")
+					SwitchTo(&RankingScene{}) //ir para tela de ranking
 				},
 			),
 
@@ -88,6 +89,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
+					fmt.Println("sair")
 					m.stack.Pop() //faz terminator em game
 				},
 			),

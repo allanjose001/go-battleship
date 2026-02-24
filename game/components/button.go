@@ -20,7 +20,7 @@ type Button struct {
 	label                      string
 	backgroundColor, textColor color.Color
 	CallBack                   func(*Button) //função que o botão chama
-	hoverColor                 color.Color
+	hoverColor, disabledColor  color.Color
 	disabled, hovered, clicked bool
 	body                       StylableWidget //um body por ex
 }
@@ -42,12 +42,31 @@ func NewButton(
 		textColor:       textColor,
 		CallBack:        cb,
 		hoverColor:      colors.Lighten(color, 0.25),
+		disabledColor:   colors.GrayOut(color, 0.35),
 	}
 
 	bt.makeBody() //cria body com body e variaveis de button
 
 	return bt
 }
+
+// SetDisabled habilita ou desabilita o botão e atualiza a cor visual imediatamente
+// Segue o mesmo padrão do hoverVerify - altera estado e aplica cor correspondente
+func (b *Button) SetDisabled(disabled bool) {
+	if b.disabled == disabled {
+		return // evita reprocessar se o estado não mudou
+	}
+
+	b.disabled = disabled
+
+	// Aplica a cor imediatamente, igual ao padrão do hover
+	if b.disabled {
+		b.body.SetColor(b.disabledColor)
+	} else {
+		b.body.SetColor(b.backgroundColor)
+	}
+}
+
 func (b *Button) GetPos() basic.Point {
 	return b.pos
 }
@@ -61,23 +80,19 @@ func (b *Button) GetSize() basic.Size {
 }
 
 func (b *Button) Update(point basic.Point) {
-	mouseX, mouseY := ebiten.CursorPosition() //ver como fazer com disabled
-
 	b.currentPos = b.pos.Add(point)
 
-	//TODO: colocar som de hovered
 	b.body.Update(b.currentPos)
 
-	b.hoverVerify(mouseX, mouseY)
-
-	b.clickVerify(mouseX, mouseY)
-
-	if b.clicked {
-		if b.CallBack != nil {
-			b.CallBack(b)
-		}
+	if b.disabled {
+		return
 	}
 
+	mouseX, mouseY := ebiten.CursorPosition() //ver como fazer com disabled
+
+	//TODO: colocar som de hovered
+	b.hoverVerify(mouseX, mouseY)
+	b.clickVerify(mouseX, mouseY)
 }
 
 func (b *Button) SetSize(sz basic.Size) {
@@ -112,7 +127,7 @@ func (b *Button) makeBody() {
 	)
 }
 
-// Hover verifica se o mouse está sob o botão
+// Hover verifica se o mouse está sob o botão e muda cor do botão caso sim
 func (b *Button) hoverVerify(mouseX, mouseY int) {
 	b.hovered = inputhelper.IsHovered(mouseX, mouseY, b.currentPos, b.size)
 
@@ -123,6 +138,7 @@ func (b *Button) hoverVerify(mouseX, mouseY int) {
 	}
 }
 
+// clickVerify verifica se botão foi clickado e chama CallBack caso sim
 func (b *Button) clickVerify(mouseX, mouseY int) {
 	b.clicked = inputhelper.IsClicked(mouseX, mouseY, b.currentPos, b.GetSize())
 

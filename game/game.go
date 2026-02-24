@@ -11,7 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var windowSize = basic.Size{W: 1280, H: 720}
+var windowSize = basic.Size{W: 1280, H: 800}
 
 type Game struct {
 	// stack que gerencia as rotas das telas do jogo - é como um singleton (única para tod0 o jogo)
@@ -25,20 +25,11 @@ func NewGame() *Game {
 		stack: scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}), //incializa com primeira scene
 	}
 
+	scenes.SwitchTo = func(next scenes.Scene) {
+		g.stack.Replace(next)
+	}
+
 	return g
-
-	// 1. Inicializa o estado global do jogo (onde ficam os dados de tabuleiros, etc)
-    //state := &state.GameState{} 
-
-    // 2. Cria a cena de perfil passando o estado
-    //g := &Game{
-        //scene: scenes.NewProfileScene(state),
-    //}
-
-    // 3. Notifica a cena que ela entrou em foco
-    //g.scene.OnEnter(nil, windowSize) 
-    
-    //return g
 
 }
 
@@ -49,13 +40,12 @@ func (g *Game) Update() error {
 	}
 	err := g.stack.Update()
 	if err != nil {
-		log.Fatal("Erro em stack.Update(): ", err)
+		log.Fatal("Erro em stack.Update() em game.go: ", err)
 	}
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	//pinta background
 	screen.Fill(colors.Background)
 
 	if !g.stack.IsEmpty() {
