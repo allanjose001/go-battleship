@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/allanjose001/go-battleship/game/components"
-	//"github.com/allanjose001/go-battleship/game/state"
+	"github.com/allanjose001/go-battleship/game/state"
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
 	"github.com/allanjose001/go-battleship/game/scenes"
@@ -19,18 +19,22 @@ type Game struct {
 }
 
 func NewGame() *Game {
-	//inicializa fonte ao inicializar game
-	components.InitFonts()
-	g := &Game{
-		stack: scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}), //incializa com primeira scene
-	}
+    components.InitFonts()
 
-	scenes.SwitchTo = func(next scenes.Scene) {
-		g.stack.Replace(next)
-	}
+    ctx := state.NewGameContext()
 
-	return g
+    // inicializa stack passando o contexto
+    stack := scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}, ctx)
 
+    scenes.SwitchTo = func(next scenes.Scene) {
+        stack.Replace(next)
+    }
+
+    g := &Game{
+        stack: stack,
+    }
+
+    return g
 }
 
 func (g *Game) Update() error {
