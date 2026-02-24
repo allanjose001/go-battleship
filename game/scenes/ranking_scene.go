@@ -1,8 +1,6 @@
 package scenes
 
 import (
-	"log"
-
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
@@ -11,18 +9,15 @@ import (
 )
 
 type RankingScene struct {
-	layout       components.Widget
-	currentPage  int
+	layout      components.Widget
+	currentPage int
+	StackHandler
 }
 
 func (m *RankingScene) OnExit(_ Scene) {}
 
 func (m *RankingScene) OnEnter(_ Scene, screenSize basic.Size) {
-	err := m.init(screenSize)
-	
-	if err != nil {
-		log.Fatal("Erro ao carregar componentes na tela inicial: ", err)
-	}
+	m.init(screenSize)
 }
 
 func (m *RankingScene) Update() error {
@@ -38,8 +33,8 @@ func (m *RankingScene) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (m *RankingScene) init(screenSize basic.Size) error {
-	
+func (m *RankingScene) init(screenSize basic.Size) {
+
 	itemsPerPage := 3
 	start := m.currentPage * itemsPerPage
 	end := start + itemsPerPage
@@ -58,7 +53,7 @@ func (m *RankingScene) init(screenSize basic.Size) error {
 	var sceneWidgets []components.Widget
 
 	sceneWidgets = append(
-		sceneWidgets, 
+		sceneWidgets,
 		components.NewText(
 			basic.Point{},
 			"Ranking",
@@ -71,15 +66,10 @@ func (m *RankingScene) init(screenSize basic.Size) error {
 		card := components.NewStatCard(
 			basic.Point{},
 			screenSize,
-			player.Stats.Matches,
-			player.Stats.Wins,
-			player.Stats.TotalScore,
-			player.Stats.HigherHitSequence,
-			player.Stats.WinRate(),
-			player.Stats.Accuracy(),
+			&player.Stats,
 			true,
 			player.Username,
-			start + i + 1,
+			start+i+1,
 		)
 		sceneWidgets = append(sceneWidgets, card)
 	}
@@ -88,7 +78,7 @@ func (m *RankingScene) init(screenSize basic.Size) error {
 
 	if m.currentPage > 0 {
 		paginationButtons = append(
-			paginationButtons, 
+			paginationButtons,
 			components.NewButton(
 				basic.Point{},
 				basic.Size{W: 150, H: 40},
@@ -105,7 +95,7 @@ func (m *RankingScene) init(screenSize basic.Size) error {
 
 	if end < len(allPlayers) {
 		paginationButtons = append(
-			paginationButtons, 
+			paginationButtons,
 			components.NewButton(
 				basic.Point{},
 				basic.Size{W: 150, H: 40},
@@ -152,7 +142,7 @@ func (m *RankingScene) init(screenSize basic.Size) error {
 			colors.Dark,
 			nil,
 			func(bt *components.Button) {
-				SwitchTo(&HomeScreen{})
+				m.stack.Pop()
 			},
 		),
 	)
@@ -166,5 +156,4 @@ func (m *RankingScene) init(screenSize basic.Size) error {
 		sceneWidgets,
 	)
 
-	return nil
 }
