@@ -9,7 +9,6 @@ var (
 	Red         = color.RGBA{R: 255, A: 255}
 	DarkBlue    = color.RGBA{R: 13, G: 89, B: 99, A: 255}
 	Blue        = color.RGBA{R: 43, G: 112, B: 121, A: 255}
-	CloudySky   = color.RGBA{R: 100, G: 100, B: 110, A: 255}
 	NightBlue   = color.RGBA{R: 40, G: 40, B: 50, A: 255}
 	PlayerInput = color.RGBA{R: 65, G: 81, B: 100, A: 255} // #415164
 	Dark        = color.RGBA{R: 48, G: 67, B: 103, A: 255}
@@ -18,14 +17,18 @@ var (
 
 	// --- NOVAS CORES PARA O MENU DE DIFICULDADES ---
 
-	// NavyBlue: O azul escuro profundo para o fundo do menu (#0D5963 aproximado)
+	// NavyBlue O azul escuro profundo para o fundo do menu (#0D5963 aproximado)
 	NavyBlue = color.RGBA{R: 13, G: 89, B: 99, A: 255}
 
-	// SeaCyan: O ciano vibrante para os botões e medalhas (#2B7079 aproximado)
+	// SeaCyan O ciano vibrante para os botões e medalhas (#2B7079 aproximado)
 	SeaCyan = color.RGBA{R: 43, G: 112, B: 121, A: 255}
 
-	// DeepWater: Um tom intermediário para contrastes navais
+	// DeepWater Um tom intermediário para contrastes navais
 	DeepWater = color.RGBA{R: 10, G: 45, B: 50, A: 255}
+
+	GoldMedal   = color.RGBA{R: 255, G: 215, B: 0, A: 255}
+	SilverMedal = color.RGBA{R: 192, G: 192, B: 192, A: 255}
+	BronzeMedal = color.RGBA{R: 205, G: 127, B: 50, A: 255}
 )
 
 // Lighten função que clareia cor (usado em hover e click em botão)
@@ -61,5 +64,5 @@ func GrayOut(c color.Color, factor float64) color.Color {
 	g = g*(1-factor) + gray*factor
 	b = b*(1-factor) + gray*factor
 
-	return color.RGBA{uint8(r), uint8(g), uint8(b), a}
+	return color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: a}
 }
