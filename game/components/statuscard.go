@@ -6,56 +6,79 @@ import (
 
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
+	"github.com/allanjose001/go-battleship/internal/entity"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// StatusCard representa um painel de estatísticas composto por vários widgets internos.
-// Ele encapsula layout, tamanho e renderização de um bloco de stats.
-// PS: Pedi pro chatgpt documentar
+// StatusCard representa um painel visual de estatísticas.
+// Ele encapsula layout, tamanho e renderização.
+// A regra de negócio vem exclusivamente de PlayerStats.
 type StatusCard struct {
-	pos        basic.Point    // posição base lógica do componente
-	currentPos basic.Point    // posição final após aplicação de offsets
-	size       basic.Size     // tamanho total do container
-	body       StylableWidget // widget raiz que desenha todo o conteúdo
+	pos        basic.Point
+	currentPos basic.Point
+	size       basic.Size
+	body       StylableWidget // container raiz que desenha tudo
 }
 
-// SetPos define a posição base do StatusCard.
+// SetPos define posição base lógica.
 func (s *StatusCard) SetPos(point basic.Point) {
 	s.pos = point
 }
 
-// NewStatCard constrói um StatusCard completo.
-// O layout muda dependendo de omnde a tela for usada (ranking x profile).
-// - isRanking: ativa versão compacta
-// - playerName: nome exibido no topo do card
+// GetPos retorna posição base.
+func (s *StatusCard) GetPos() basic.Point {
+	return s.pos
+}
+
+// GetSize retorna tamanho total do card.
+func (s *StatusCard) GetSize() basic.Size {
+	return s.size
+}
+
+// Update propaga offset para o corpo.
+func (s *StatusCard) Update(offset basic.Point) {
+	s.currentPos = s.pos.Add(offset)
+	s.body.Update(s.currentPos)
+}
+
+// Draw delega renderização ao container interno.
+func (s *StatusCard) Draw(screen *ebiten.Image) {
+	s.body.Draw(screen)
+}
+
+// NewStatCard constrói o componente completo.
+// stats contém toda regra de domínio.
+// isRanking define layout compacto ou completo.
 func NewStatCard(
 	pos basic.Point,
 	screenSize basic.Size,
-	matches, wins, score, higherHitSequence int,
-	winrate, mediumHitRate float32,
+	stats *entity.PlayerStats,
 	isRanking bool,
 	playerName string,
 	rankingPosition int,
 ) *StatusCard {
 
+	// Decide tamanhos estruturais do card
 	contSize, cardSize := switchSizes(isRanking, screenSize)
 
-	// Gera lista de widgets de estatísticas conforme modo
-	statsList := initWidgets(matches, wins, winrate, mediumHitRate, score, higherHitSequence, isRanking, cardSize)
+	// Gera widgets internos a partir da entidade
+	statsList := initWidgets(stats, isRanking, cardSize)
 
+	// Widget de título (varia se for ranking)
 	var titleWidget Widget
 
 	if isRanking {
+
 		var circleColor color.Color
 		switch rankingPosition {
 		case 1:
-			circleColor = color.RGBA{R: 255, G: 215, B: 0, A: 255} // Dourado
+			circleColor = colors.GoldMedal
 		case 2:
-			circleColor = color.RGBA{R: 192, G: 192, B: 192, A: 255} // Prata
+			circleColor = colors.SilverMedal
 		case 3:
-			circleColor = color.RGBA{R: 205, G: 127, B: 50, A: 255} // Bronze
+			circleColor = colors.BronzeMedal
 		default:
-			circleColor = colors.White // Branco para os demais
+			circleColor = colors.White
 		}
 
 		rankText := NewText(
@@ -82,6 +105,9 @@ func NewStatCard(
 			30,
 		)
 
+		// Row usa contSize como referência de alinhamento.
+		// O size passado para Row representa o tamanho do pai imediato
+		// que será usado para calcular Center / End.
 		titleWidget = NewRow(
 			basic.Point{},
 			15,
@@ -90,7 +116,9 @@ func NewStatCard(
 			basic.Center,
 			[]Widget{rankCircle, nameText},
 		)
+
 	} else {
+
 		titleWidget = NewText(
 			basic.Point{},
 			playerName,
@@ -103,30 +131,51 @@ func NewStatCard(
 		pos:        pos,
 		currentPos: pos,
 		size:       contSize,
-		body: NewContainer( //pai de todos
+
+		// Container raiz.
+		// Ele recebe contSize e controla alinhamento global.
+		body: NewContainer(
 			basic.Point{},
-			contSize, 12,
+			contSize,
+			12,
 			colors.Dark,
-			basic.Start, //não precisa mexer aqui pois os filhos são Layout
-			basic.Start, //, não há como fazer sobrecarga de metodo
+			basic.Start,
+			basic.Start,
+
+			// Column principal do card.
+			// IMPORTANTE:
+			// O size passado (contSize) é o tamanho do pai.
+			// Column usa esse size apenas como referência
+			// para calcular MainAlign e CrossAlign.
 			NewColumn(
-				basic.Point{}, 10, contSize,
-				basic.Center, basic.Center,
+				basic.Point{},
+				10,
+				contSize, // size do pai para cálculo de alinhamento
+				basic.Center,
+				basic.Center,
 				[]Widget{
-					// Nome do jogador no topo
+
+					// Título
 					titleWidget,
-					// Container intermediário que organiza a Row de stats
+
+					// Container intermediário apenas para organizar a Row de stats.
 					NewContainer(
 						basic.Point{},
 						basic.Size{
 							W: contSize.W,
 							H: cardSize.H,
-						}, 0,
+						},
+						0,
 						nil,
 						basic.Start,
 						basic.Start,
+
+						// Row das estatísticas.
+						// O size passado aqui representa
+						// o espaço disponível dentro desse container.
 						NewRow(
-							basic.Point{}, 20,
+							basic.Point{},
+							20,
 							basic.Size{
 								W: contSize.W,
 								H: cardSize.H,
@@ -142,86 +191,74 @@ func NewStatCard(
 	}
 }
 
-// switchSizes decide layout que o componente vai assumir
+// switchSizes decide layout estrutural.
 func switchSizes(isRanking bool, screenSize basic.Size) (basic.Size, basic.Size) {
-	var contSize, cardSize basic.Size
 
-	// Define tamanhos diferentes para ranking (compacto) vs tela de profile
 	if isRanking {
-		contSize = basic.Size{
-			W: 0.9 * screenSize.W,
-			H: 120,
-		}
-		cardSize = basic.Size{W: 300, H: 60}
-	} else {
-		contSize = basic.Size{
+		return basic.Size{
+				W: 0.9 * screenSize.W,
+				H: 120,
+			},
+			basic.Size{W: 300, H: 60}
+	}
+
+	return basic.Size{
 			W: 0.9 * screenSize.W,
 			H: 220,
-		}
-		cardSize = basic.Size{W: 210, H: 100}
-	}
-	return contSize, cardSize
+		},
+		basic.Size{W: 210, H: 100}
 }
 
-// GetPos retorna a posição base do StatusCard.
-func (s *StatusCard) GetPos() basic.Point {
-	return s.pos
-}
+// initWidgets converte PlayerStats em widgets visuais.
+// Nenhuma regra é calculada aqui — apenas formatação.
+func initWidgets(
+	stats *entity.PlayerStats,
+	ranking bool,
+	size basic.Size,
+) []Widget {
 
-// GetSize retorna o tamanho total do StatusCard.
-func (s *StatusCard) GetSize() basic.Size {
-	return s.size
-}
-
-// Update recalcula posição final com offset e propaga para o corpo.
-func (s *StatusCard) Update(offset basic.Point) {
-	s.currentPos = s.pos.Add(offset)
-	s.body.Update(s.currentPos)
-}
-
-// Draw delega o desenho para o widget interno.
-func (s *StatusCard) Draw(screen *ebiten.Image) {
-	s.body.Draw(screen)
-}
-
-// initWidgets cria os cartões individuais de estatística.
-// Retorna versão completa ou compacta dependendo do uso.
-func initWidgets(matches int, wins int, winrate float32, mediumHitRate float32, score int, higherHitSequence int, ranking bool, size basic.Size) []Widget {
-	// versão compacta para ranking
 	if ranking {
 		return []Widget{
-			createStatCard("Pontuação Total", fmt.Sprintf("%d", score), size),
-			createStatCard("Vitórias", fmt.Sprintf("%d", wins), size),
-			createStatCard("Maior Sequência de Acertos", fmt.Sprintf("%d", higherHitSequence), size),
+			createStatCard("Pontuação Total",
+				fmt.Sprintf("%d", stats.TotalScore), size),
+			createStatCard("Vitórias",
+				fmt.Sprintf("%d", stats.Wins), size),
+			createStatCard("Maior Sequência de Acertos",
+				fmt.Sprintf("%d", stats.HigherHitSequence), size),
 		}
 	}
 
-	// versão completa
 	return []Widget{
-		createStatCard("Partidas", fmt.Sprintf("%d", matches), size),
-		createStatCard("Vitórias", fmt.Sprintf("%d", wins), size),
-		createStatCard("% de Vitória", fmt.Sprintf("%.2f", winrate)+" %", size),
-		createStatCard("% de Acertos Média", fmt.Sprintf("%.2f", mediumHitRate)+" %", size),
-		createStatCard("Maior Score", fmt.Sprintf("%d", score), size),
+		createStatCard("Partidas",
+			fmt.Sprintf("%d", stats.Matches), size),
+		createStatCard("Vitórias",
+			fmt.Sprintf("%d", stats.Wins), size),
+		createStatCard("% de Vitória",
+			fmt.Sprintf("%.2f %%", stats.WinRate()), size),
+		createStatCard("% de Acertos Média",
+			fmt.Sprintf("%.2f %%", stats.Accuracy()), size),
+		createStatCard("Maior Score",
+			fmt.Sprintf("%d", stats.HighScore), size),
 	}
 }
 
-// createStatCard cria um card visual individual com label + valor.
-// Encapsula layout interno (texto + container branco).
+// createStatCard encapsula label + valor.
+// Column interna usa o size do container pai
+// para calcular alinhamento centralizado.
 func createStatCard(label, value string, size basic.Size) *Container {
+
 	labelTxt := NewText(basic.Point{}, label, colors.Black, 20)
 	valueTxt := NewText(basic.Point{}, value, colors.Black, 25)
 
-	// coluna centralizada com label em cima e valor embaixo
 	content := NewColumn(
-		basic.Point{X: 0, Y: 0}, 5,
-		size,
+		basic.Point{},
+		5,
+		size, // size do pai usado como referência de alinhamento
 		basic.Center,
 		basic.Center,
 		[]Widget{labelTxt, valueTxt},
 	)
 
-	// container visual do card
 	return NewContainer(
 		basic.Point{},
 		size,
