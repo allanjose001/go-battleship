@@ -1,7 +1,10 @@
 package scenes
 
-import "github.com/allanjose001/go-battleship/game/state"
+import (
+	"github.com/allanjose001/go-battleship/game/state"
+)
 
+// StackHandler possui a stack e o context e implementa awares
 type StackHandler struct {
 	stack *SceneStack
 	ctx   *state.GameContext
