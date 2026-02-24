@@ -78,7 +78,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
-					SwitchTo(&RankingScene{}) //ir para tela de ranking
+					m.stack.Push(&RankingScene{})
 				},
 			),
 

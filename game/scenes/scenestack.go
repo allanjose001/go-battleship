@@ -2,6 +2,7 @@ package scenes
 
 import (
 	"github.com/allanjose001/go-battleship/game/components/basic"
+	"github.com/allanjose001/go-battleship/game/state"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -9,6 +10,7 @@ import (
 // partilham de um fluxo)
 type SceneStack struct {
 	stack      []Scene
+	ctx        *state.GameContext
 	screenSize basic.Size
 }
 
@@ -17,10 +19,16 @@ type stackAware interface {
 	SetStack(*SceneStack)
 }
 
-func NewSceneStack(size basic.Size, first Scene) *SceneStack {
+// contextAware tambem serve para passar context adiante
+type contextAware interface {
+	SetContext(*state.GameContext)
+}
+
+func NewSceneStack(size basic.Size, first Scene, ctx *state.GameContext) *SceneStack {
 	s := &SceneStack{
 		stack:      []Scene{},
 		screenSize: size,
+		ctx:        ctx,
 	}
 
 	s.Push(first)
@@ -43,6 +51,11 @@ func (s *SceneStack) Push(next Scene) {
 	// injeta stack se a cena suportar
 	if aware, ok := next.(stackAware); ok {
 		aware.SetStack(s)
+	}
+
+	//mesmo com context
+	if aware, ok := next.(contextAware); ok {
+		aware.SetContext(s.ctx)
 	}
 
 	var prev Scene

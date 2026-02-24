@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"github.com/allanjose001/go-battleship/game/components"
+	"github.com/allanjose001/go-battleship/game/state"
+
 	//"github.com/allanjose001/go-battleship/game/state"
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
@@ -22,7 +24,7 @@ func NewGame() *Game {
 	//inicializa fonte ao inicializar game
 	components.InitFonts()
 	g := &Game{
-		stack: scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}), //incializa com primeira scene
+		stack: scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}, &state.GameContext{}), //incializa com primeira scene
 	}
 
 	scenes.SwitchTo = func(next scenes.Scene) {
