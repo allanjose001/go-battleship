@@ -9,6 +9,8 @@ import (
 // partilham de um fluxo)
 type SceneStack struct {
 	stack      []Scene
+
+	ctx        *GameContext
 	screenSize basic.Size
 }
 
@@ -17,10 +19,11 @@ type stackAware interface {
 	SetStack(*SceneStack)
 }
 
-func NewSceneStack(size basic.Size, first Scene) *SceneStack {
+func NewSceneStack(size basic.Size, first Scene, ctx *GameContext) *SceneStack {
 	s := &SceneStack{
 		stack:      []Scene{},
 		screenSize: size,
+		ctx: 
 	}
 
 	s.Push(first)
@@ -43,6 +46,11 @@ func (s *SceneStack) Push(next Scene) {
 	// injeta stack se a cena suportar
 	if aware, ok := next.(stackAware); ok {
 		aware.SetStack(s)
+	}
+
+	//mesmo com context
+	if aware, ok := next.(contextAware); ok {
+		aware.SetContext(s.ctx)
 	}
 
 	var prev Scene
