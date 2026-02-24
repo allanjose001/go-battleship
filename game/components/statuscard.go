@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"image/color"
 
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
@@ -30,16 +31,73 @@ func (s *StatusCard) SetPos(point basic.Point) {
 func NewStatCard(
 	pos basic.Point,
 	screenSize basic.Size,
-	matches, wins, score int,
+	matches, wins, score, higherHitSequence int,
 	winrate, mediumHitRate float32,
 	isRanking bool,
 	playerName string,
+	rankingPosition int,
 ) *StatusCard {
 
 	contSize, cardSize := switchSizes(isRanking, screenSize)
 
 	// Gera lista de widgets de estatísticas conforme modo
-	statsList := initWidgets(matches, wins, winrate, mediumHitRate, score, isRanking, cardSize)
+	statsList := initWidgets(matches, wins, winrate, mediumHitRate, score, higherHitSequence, isRanking, cardSize)
+
+	var titleWidget Widget
+
+	if isRanking {
+		var circleColor color.Color
+		switch rankingPosition {
+		case 1:
+			circleColor = color.RGBA{R: 255, G: 215, B: 0, A: 255} // Dourado
+		case 2:
+			circleColor = color.RGBA{R: 192, G: 192, B: 192, A: 255} // Prata
+		case 3:
+			circleColor = color.RGBA{R: 205, G: 127, B: 50, A: 255} // Bronze
+		default:
+			circleColor = colors.White // Branco para os demais
+		}
+
+		rankText := NewText(
+			basic.Point{},
+			fmt.Sprintf("%d°", rankingPosition),
+			colors.Black,
+			20,
+		)
+
+		rankCircle := NewContainer(
+			basic.Point{},
+			basic.Size{W: 40, H: 40},
+			20,
+			circleColor,
+			basic.Center,
+			basic.Center,
+			rankText,
+		)
+
+		nameText := NewText(
+			basic.Point{},
+			playerName,
+			colors.White,
+			30,
+		)
+
+		titleWidget = NewRow(
+			basic.Point{},
+			15,
+			basic.Size{W: contSize.W, H: 40},
+			basic.Center,
+			basic.Center,
+			[]Widget{rankCircle, nameText},
+		)
+	} else {
+		titleWidget = NewText(
+			basic.Point{},
+			playerName,
+			colors.White,
+			30,
+		)
+	}
 
 	return &StatusCard{
 		pos:        pos,
@@ -56,7 +114,7 @@ func NewStatCard(
 				basic.Center, basic.Center,
 				[]Widget{
 					// Nome do jogador no topo
-					NewText(basic.Point{}, playerName, colors.White, 30),
+					titleWidget,
 					// Container intermediário que organiza a Row de stats
 					NewContainer(
 						basic.Point{},
@@ -92,7 +150,7 @@ func switchSizes(isRanking bool, screenSize basic.Size) (basic.Size, basic.Size)
 	if isRanking {
 		contSize = basic.Size{
 			W: 0.9 * screenSize.W,
-			H: 130,
+			H: 120,
 		}
 		cardSize = basic.Size{W: 300, H: 60}
 	} else {
@@ -128,13 +186,13 @@ func (s *StatusCard) Draw(screen *ebiten.Image) {
 
 // initWidgets cria os cartões individuais de estatística.
 // Retorna versão completa ou compacta dependendo do uso.
-func initWidgets(matches int, wins int, winrate float32, mediumHitRate float32, score int, ranking bool, size basic.Size) []Widget {
+func initWidgets(matches int, wins int, winrate float32, mediumHitRate float32, score int, higherHitSequence int, ranking bool, size basic.Size) []Widget {
 	// versão compacta para ranking
 	if ranking {
 		return []Widget{
-			createStatCard("% de Vitória", fmt.Sprintf("%.2f", winrate)+" %", size),
-			createStatCard("% de Acertos Média", fmt.Sprintf("%.2f", mediumHitRate)+" %", size),
-			createStatCard("Maior Score", fmt.Sprintf("%d", score), size),
+			createStatCard("Pontuação Total", fmt.Sprintf("%d", score), size),
+			createStatCard("Vitórias", fmt.Sprintf("%d", wins), size),
+			createStatCard("Maior Sequência de Acertos", fmt.Sprintf("%d", higherHitSequence), size),
 		}
 	}
 

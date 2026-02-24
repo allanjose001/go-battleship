@@ -46,7 +46,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 	homeImage, err := components.NewImage(
 		"assets/images/home-screen.png",
 		basic.Point{},
-		basic.Size{W: 580, H: 400})
+		basic.Size{W: 500, H: 500})
 
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 	m.layout = components.NewColumn(
 		basic.Point{},
 		20,
-		basic.Size{W: screenSize.W, H: screenSize.H},
+		screenSize,
 		basic.Center,
 		basic.Center,
 		[]components.Widget{
@@ -67,7 +67,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				nil,
 				func(bt *components.Button) {
 					// ir para tela de seleção de perfis
-					SwitchTo(&SelectProfileScene{})
+					m.stack.Push(&SelectProfileScene{})
 				},
 			),
 
@@ -78,7 +78,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
-					//m.stack.Push() //TODO: ir para tela de Ranking
+					SwitchTo(&RankingScene{}) //ir para tela de ranking
 				},
 			),
 
