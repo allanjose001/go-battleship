@@ -4,7 +4,6 @@ import (
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/state"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/allanjose001/go-battleship/game/state"
 )
 
 // SceneStack struct que gerencia rotas (para scenes que necessitam de compartilhar estado e/ou
@@ -24,7 +23,7 @@ func NewSceneStack(size basic.Size, first Scene, ctx *state.GameContext) *SceneS
 	s := &SceneStack{
 		stack:      []Scene{},
 		screenSize: size,
-		ctx: 		ctx,
+		ctx:        ctx,
 	}
 
 	s.Push(first)
@@ -32,7 +31,7 @@ func NewSceneStack(size basic.Size, first Scene, ctx *state.GameContext) *SceneS
 }
 
 func (s *SceneStack) SetContext(ctx *state.GameContext) {
-    s.ctx = ctx
+	s.ctx = ctx
 }
 
 func (s *SceneStack) IsEmpty() bool {
@@ -53,13 +52,12 @@ func (s *SceneStack) Push(next Scene) {
 		aware.SetStack(s)
 	}
 
-    // injeta contexto se disponível e a cena suportar
-    if s.ctx != nil {
-        if ca, ok := next.(state.ContextAware); ok {
-            ca.SetContext(s.ctx)
-        }
-    }
-
+	// injeta contexto se disponível e a cena suportar
+	if s.ctx != nil {
+		if ca, ok := next.(state.ContextAware); ok {
+			ca.SetContext(s.ctx)
+		}
+	}
 
 	var prev Scene
 	if len(s.stack) > 0 {
@@ -87,15 +85,15 @@ func (s *SceneStack) Pop() {
 
 	top.OnExit(next)
 
-    if next != nil {
-        // injeta contexto na próxima também (caso necessário)
-        if s.ctx != nil {
-            if ca, ok := next.(state.ContextAware); ok {
-                ca.SetContext(s.ctx)
-            }
-        }
-        next.OnEnter(top, s.screenSize)
-    }
+	if next != nil {
+		// injeta contexto na próxima também (caso necessário)
+		if s.ctx != nil {
+			if ca, ok := next.(state.ContextAware); ok {
+				ca.SetContext(s.ctx)
+			}
+		}
+		next.OnEnter(top, s.screenSize)
+	}
 }
 
 // Replace troca sem passar estado
