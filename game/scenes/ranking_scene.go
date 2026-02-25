@@ -168,7 +168,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 	previousButton := components.NewButton(
 		basic.Point{},
 		basic.Size{W: 150, H: 40},
-		"Anterior",
+		"< Anterior",
 		prevColor,
 		nil,
 		previousHandler,
@@ -177,7 +177,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 	nextButton := components.NewButton(
 		basic.Point{},
 		basic.Size{W: 150, H: 40},
-		"Próximo",
+		"Próximo >",
 		nextColor,
 		nil,
 		nextHandler,
