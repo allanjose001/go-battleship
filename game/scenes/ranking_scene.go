@@ -82,10 +82,20 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		nextHandler = nil
 		nextColor = colors.NightBlue
 	}
-	
+
+	topSpacer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: screenSize.W, H: screenSize.H * 0.1},
+		0,
+		nil,
+		basic.Center,
+		basic.Center,
+		nil,
+	)
+
 	title := components.NewContainer(
 		basic.Point{},
-		basic.Size{W: screenSize.W, H: 60}, // Reduzido levemente a altura do container
+		basic.Size{W: screenSize.W, H: 60},
 		0,
 		nil,
 		basic.Center,
@@ -97,7 +107,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 			42,
 		),
 	)
-	
+
 	rankingHeight := calculateRankingHeight(screenSize)
 
 	var cards []components.Widget
@@ -117,7 +127,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		basic.Point{},
 		10,
 		basic.Size{W: screenSize.W, H: rankingHeight},
-		basic.Center, // Alterado para Center
+		basic.Start, 
 		basic.Center,
 		cards,
 	)
@@ -127,7 +137,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		basic.Size{W: screenSize.W, H: rankingHeight},
 		0,
 		nil,
-		basic.Center, // Alterado para Center
+		basic.Start, 
 		basic.Center,
 		cardsColumn,
 	)
@@ -152,7 +162,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	pagRow := components.NewRow(
 		basic.Point{},
-		10, // Aproximado (era 20)
+		10, 
 		basic.Size{W: screenSize.W, H: 40},
 		basic.Center,
 		basic.Center,
@@ -164,14 +174,14 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		basic.Size{W: screenSize.W, H: 50},
 		0,
 		nil,
-		basic.Center, // Alterado para Center
+		basic.Center,
 		basic.Center,
 		pagRow,
 	)
 
 	backButton := components.NewContainer(
 		basic.Point{},
-		basic.Size{W: screenSize.W, H: 60}, // Reduzido para aproximar
+		basic.Size{W: screenSize.W, H: 60},
 		0,
 		nil,
 		basic.Center,
@@ -188,14 +198,14 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		),
 	)
 
-	// LAYOUT FINAL CENTRALIZADO
 	m.layout = components.NewColumn(
 		basic.Point{},
-		10, // Espaçamento fixo entre os blocos (Título, Ranking, Paginação, Botão)
+		15,           
 		basic.Size{W: screenSize.W, H: screenSize.H},
-		basic.Center, // Centraliza na Vertical
-		basic.Center, // Centraliza na Horizontal
+		basic.Start,  
+		basic.Center, 
 		[]components.Widget{
+			topSpacer,
 			title,
 			rankingContainer,
 			paginationContainer,
