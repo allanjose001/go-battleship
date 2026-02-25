@@ -21,7 +21,6 @@ type TextField struct {
 	textColor        color.Color
 	placeholderColor color.Color
 	backgroundColor  color.Color
-	MaxChars         int
 
 	// 🔹 Cursor
 	cursorVisible   bool
@@ -37,7 +36,6 @@ func NewTextField(pos basic.Point, size basic.Size, placeholder string) *TextFie
 		textColor:        colors.White,
 		placeholderColor: color.RGBA{160, 170, 190, 255},
 		backgroundColor:  colors.NightBlue,
-		MaxChars: 50,
 
 		// 🔹 Configuração do cursor
 		cursorVisible:   true,
@@ -99,10 +97,6 @@ func (t *TextField) Update(offset basic.Point) {
 	}
 
 	inputhelper.ReceiveText(&t.Text, t.focused)
-
-	if t.MaxChars > 0 && len(t.Text) > t.MaxChars {
-        t.Text = t.Text[:t.MaxChars]
-    }
 
 	// 🔹 Controle do cursor piscando
 	if t.focused {
