@@ -1,6 +1,10 @@
 package ai
 
-import ( "github.com/allanjose001/go-battleship/internal/entity" )
+import (
+	"fmt"
+
+	"github.com/allanjose001/go-battleship/internal/entity"
+)
 
 
 type AIPlayer struct { 
@@ -48,13 +52,23 @@ func (ai *AIPlayer) SizeOfNextShip() int {
 }
 
 // marca o navio como destruído na fleet interna do AI (por referência)
+// fallback: marca por size caso ponteiro não exista (evita inconsistência)
 func (ai *AIPlayer) FleetShipDestroyed(ship *entity.Ship) {
-    if ship == nil {
+    if ship == nil || ai.enemyFleet == nil {
         return
     }
     for i, s := range ai.enemyFleet.Ships {
         if s == ship {
             ai.enemyFleet.Ships[i].HitCount = s.Size
+            fmt.Printf("FleetShipDestroyed: matched by pointer index=%d size=%d\n", i, s.Size)
+            return
+        }
+    }
+    // fallback: marcar first ship with same size that's not destroyed
+    for i, s := range ai.enemyFleet.Ships {
+        if s != nil && s.Size == ship.Size && !s.IsDestroyed() {
+            ai.enemyFleet.Ships[i].HitCount = s.Size
+            fmt.Printf("FleetShipDestroyed: fallback matched index=%d size=%d\n", i, s.Size)
             return
         }
     }
@@ -171,14 +185,22 @@ func (ai *AIPlayer) WreckedShipAdjustment(board *entity.Board, row, col int) {
 
 // Adiciona uma posição válida à fila de prioridade
 func (ai *AIPlayer) AddToPriorityQueue(row, col int) {
-	if ai.IsValid(row, col) {
-		ai.priorityQueue = append(ai.priorityQueue, Pair{row, col})
-	}
+    if !ai.IsValid(row, col) {
+        return
+    }
+    // dedupe
+    for _, p := range ai.priorityQueue {
+        if p.row == row && p.col == col {
+            return
+        }
+    }
+    ai.priorityQueue = append(ai.priorityQueue, Pair{row, col})
+    fmt.Printf("PQ: push %d,%d len=%d\n", row, col, len(ai.priorityQueue))
 }
 
-// Limpa a fila de prioridade
 func (ai *AIPlayer) ClearPriorityQueue() {
-	ai.priorityQueue = []Pair{}
+    ai.priorityQueue = nil
+    fmt.Println("PQ: cleared")
 }
 
 // Adiciona posições vizinhas à fila de prioridade
@@ -207,8 +229,9 @@ func (ai *AIPlayer) PopPriority() (row, y int) {
 		return -1, -1
 	}
 
-	p := ai.priorityQueue[0]
-	ai.priorityQueue = ai.priorityQueue[1:]
+    p := ai.priorityQueue[0]
+    ai.priorityQueue = ai.priorityQueue[1:]
+    fmt.Printf("PQ: pop %d,%d len=%d\n", p.row, p.col, len(ai.priorityQueue))
 	return p.row, p.col
 }
 
