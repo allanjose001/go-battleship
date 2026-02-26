@@ -20,21 +20,21 @@ func (ai *AIPlayer) Attack(enemyBoard *entity.Board) {
 }
 
 func (ai *AIPlayer) AdjustStrategy(board *entity.Board, row, y int, ship *entity.Ship) {
-	if ship == nil {
-		ai.virtualBoard[row][y] = 1
-		return
-	}
+    if ship == nil {
+        ai.virtualBoard[row][y] = 1
+        return
+    }
 
-	if ship.IsDestroyed() {
-		ai.virtualBoard[row][y] = 3
-		//ai.WreckedShipAdjustment(board, row, y)
-		ai.ClearPriorityQueue()
-		ai.FleetShipDestroyed(ship.Size)
-		ai.StopChase()
-	} else {
-		ai.virtualBoard[row][y] = 2
-		ai.AttackNeighbors(row, y)
-	}
+    if ship.IsDestroyed() {
+        ai.virtualBoard[row][y] = 3
+        //ai.WreckedShipAdjustment(board, row, y)
+        ai.ClearPriorityQueue()
+        ai.FleetShipDestroyed(ship) // <- enviar ponteiro do navio
+        ai.StopChase()
+    } else {
+        ai.virtualBoard[row][y] = 2
+        ai.AttackNeighbors(row, y)
+    }
 }
 
 // retorna o tamanho do proximo navio da enemyFleet
@@ -47,14 +47,17 @@ func (ai *AIPlayer) SizeOfNextShip() int {
 	return 0
 }
 
-// marca o navio como destruído na fleet interna do AI
-func (ai *AIPlayer) FleetShipDestroyed(size int) {
-	for _, ship := range ai.enemyFleet.Ships {
-		if ship != nil && ship.Size == size && !ship.IsDestroyed() {
-			ship.HitCount = ship.Size
-			return
-		}
-	}
+// marca o navio como destruído na fleet interna do AI (por referência)
+func (ai *AIPlayer) FleetShipDestroyed(ship *entity.Ship) {
+    if ship == nil {
+        return
+    }
+    for i, s := range ai.enemyFleet.Ships {
+        if s == ship {
+            ai.enemyFleet.Ships[i].HitCount = s.Size
+            return
+        }
+    }
 }
 
 // Retorna a posição inicial do navio (mais à esquerda se horizontal, mais acima se vertical)

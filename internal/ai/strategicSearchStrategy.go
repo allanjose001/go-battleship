@@ -6,14 +6,14 @@ import "fmt"
 type StrategicSearchStrategy struct{}
 
 func (s *StrategicSearchStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
-	fmt.Println("strategicSearchStrategy usada")
-
+        fmt.Println("passou por SSS")
     if len(ai.priorityQueue) != 0 {
         return false
     }
     if !ai.ShouldAttackStrategicPositions() {
         return false
     }
+    fmt.Println("strategicSearchStrategy usada")
     size := ai.SizeOfNextShip()
     if size == 0 {
         return false
