@@ -121,11 +121,6 @@ func RemoveProfile(username string) error {
 	return os.WriteFile(defaultPath, data, 0644)
 }
 
-// GetProfileMedals retorna medalhas em forma de struct -> [está aqui para evitar cyclic imports]
-func GetProfileMedals(p entity.Profile) []*medal.Medal {
-	return medal.GetMedals(p.MedalsNames)
-}
-
 // AddMatchToProfile repassa salvamento para profile e atualiza saves no arquivo,
 // retorna numero de medalhas ganhas apos partida
 func AddMatchToProfile(profile *entity.Profile, result entity.MatchResult) (int, error) {

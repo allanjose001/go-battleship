@@ -7,12 +7,14 @@ import (
 )
 
 // MedalsList lista de todas as medalhas do jogo com os caminhos atualizados
+var grayIconPath = "assets/medals/Interrogação.png"
+
 var MedalsList = []*Medal{
 	{
 		Name:         "Almirante",
 		Description:  "Venceu sem perder navios",
 		IconPath:     "assets/medals/Medalha1.png",
-		GrayIconPath: "assets/medals/Interrogação.png",
+		GrayIconPath: grayIconPath,
 		Verification: func(stats entity.PlayerStats) bool {
 			return stats.WinWithoutLosses
 		},
@@ -21,7 +23,7 @@ var MedalsList = []*Medal{
 		Name:         "Capitão",
 		Description:  "Acertou 7 tiros seguidos",
 		IconPath:     "assets/medals/Medalha2.png",
-		GrayIconPath: "assets/medals/Interrogação.png",
+		GrayIconPath: grayIconPath,
 		Verification: func(stats entity.PlayerStats) bool {
 			return stats.HigherHitSequence >= 7
 		},
@@ -30,7 +32,7 @@ var MedalsList = []*Medal{
 		Name:         "Capitão de Mar e Guerra",
 		Description:  "Acertou 8 tiros seguidos",
 		IconPath:     "assets/medals/Medalha3.png",
-		GrayIconPath: "assets/medals/Interrogação.png",
+		GrayIconPath: grayIconPath,
 		Verification: func(stats entity.PlayerStats) bool {
 			return stats.HigherHitSequence >= 8
 		},
@@ -39,7 +41,7 @@ var MedalsList = []*Medal{
 		Name:         "Marinheiro",
 		Description:  "Venceu em 1 minuto",
 		IconPath:     "assets/medals/Medalha4.png",
-		GrayIconPath: "assets/medals/Interrogação.png",
+		GrayIconPath: grayIconPath,
 		Verification: func(stats entity.PlayerStats) bool {
 			// Evita erro se o tempo for 0 (nunca jogou)
 			return stats.FasterTime > 0 && stats.FasterTime <= time.Minute.Milliseconds()
@@ -59,11 +61,19 @@ func init() {
 
 // GetMedals serve para pegar os objetos medal pelo nome
 func GetMedals(names []string) []*Medal {
-	var result []*Medal
+	result := make([]*Medal, len(MedalsList)) // tamanho igual à lista oficial
+	unlocked := make(map[string]bool)
 	for _, n := range names {
-		if m, ok := MedalsMap[n]; ok {
-			result = append(result, m)
+		unlocked[n] = true
+	}
+
+	for i, m := range MedalsList {
+		if unlocked[m.Name] {
+			result[i] = m
+		} else {
+			result[i] = nil // medalha ainda não conquistada
 		}
 	}
+
 	return result
 }
