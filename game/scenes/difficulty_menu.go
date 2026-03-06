@@ -35,7 +35,7 @@ func NewDifficultyMenu(w, h int, onSelect func(player *ai.AIPlayer)) *Difficulty
 		basic.Center,
 		basic.Center,
 		[]components.Widget{
-			components.NewText(basic.Point{}, "SELECIONE SUA PATENTE", colors.White, 28),
+			components.NewText(basic.Point{}, "SELEÇÃO DE DIFICULDADE", colors.White, 28),
 			btnRecruta, btnImediato, btnAlmirante,
 		},
 	)
