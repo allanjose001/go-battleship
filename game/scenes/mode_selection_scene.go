@@ -88,7 +88,7 @@ func (d *DifficultyScene) OnEnter(prev Scene, size basic.Size) {
 		}
 
 		d.stack.Push(NewPlacementSceneWithProfile(prof))
-	})
+	}, d.stack.Pop)
 }
 
 func (d *DifficultyScene) OnExit(next Scene) {}

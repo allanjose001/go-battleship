@@ -13,7 +13,7 @@ type DifficultyMenu struct {
 	StackHandler
 }
 
-func NewDifficultyMenu(w, h int, onSelect func(difficulty string)) *DifficultyMenu {
+func NewDifficultyMenu(w, h int, onSelect func(difficulty string), onBack func()) *DifficultyMenu {
 	btnSize := basic.Size{W: 220, H: 60}
 
 	btnRecruta := components.NewButton(basic.Point{}, btnSize, "Recruta", colors.Blue, colors.White, func(b *components.Button) {
@@ -28,6 +28,18 @@ func NewDifficultyMenu(w, h int, onSelect func(difficulty string)) *DifficultyMe
 		onSelect("hard")
 	})
 
+	// Botão Voltar 
+	btnVoltar := components.NewButton(
+		basic.Point{},
+		basic.Size{W: 220, H: 55},
+		"Voltar",
+		colors.Dark,
+		colors.White,
+		func(b *components.Button) {
+			onBack()
+		},
+	)
+
 	screenSize := basic.Size{W: float32(w), H: float32(h)}
 	column := components.NewColumn(
 		basic.Point{X: 0, Y: 0},
@@ -37,7 +49,10 @@ func NewDifficultyMenu(w, h int, onSelect func(difficulty string)) *DifficultyMe
 		basic.Center,
 		[]components.Widget{
 			components.NewText(basic.Point{}, "SELEÇÃO DE DIFICULDADE", colors.White, 28),
-			btnRecruta, btnImediato, btnAlmirante,
+			btnRecruta, 
+			btnImediato, 
+			btnAlmirante,
+			btnVoltar, 
 		},
 	)
 	return &DifficultyMenu{layout: column, onSelect: onSelect}
