@@ -57,7 +57,13 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 	pageResults := results[start:end]
 
 	// Construção da UI
-	title := components.NewText(basic.Point{}, "Histórico - "+s.difficultyName, colors.White, 32)
+	titleContainer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: size.W, H: 80},
+		0, nil,
+		basic.Center, basic.Center,
+		components.NewText(basic.Point{}, "Histórico - "+s.difficultyName, colors.White, 32),
+	)
 
 	var cards []components.Widget
 	for _, res := range pageResults {
@@ -74,52 +80,102 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 		cards = append(cards, components.NewText(basic.Point{}, "Nenhuma partida registrada.", colors.White, 24))
 	}
 
+	// Calcula altura disponível para a lista para não empurrar os botões para fora
+	// Altura total - Título(80) - Paginação(60) - Voltar(80) - Espaçamentos(~30)
+	listHeight := size.H - 250
+
 	listColumn := components.NewColumn(
 		basic.Point{},
 		20,
-		basic.Size{W: size.W, H: size.H * 0.7},
-		basic.Center,
+		basic.Size{W: size.W, H: listHeight},
+		basic.Start, // Alinha itens no topo
 		basic.Center,
 		cards,
+	)
+
+	listContainer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: size.W, H: listHeight},
+		0, nil,
+		basic.Start, basic.Center,
+		listColumn,
 	)
 
 	// Botões de navegação
 	hasPrev := s.currentPage > 0
 	hasNext := end < len(results)
+	
+	var previousHandler func(*components.Button)
+	var nextHandler func(*components.Button)
 
-	prevBtn := components.NewButton(basic.Point{}, basic.Size{W: 120, H: 40}, "< Ant", colors.Dark, nil, func(b *components.Button) {
-		if hasPrev {
+	prevColor := colors.Dark
+	nextColor := colors.Dark
+
+	if hasPrev {
+		previousHandler = func(b *components.Button) {
 			s.currentPage--
 			s.init(size)
 		}
-	})
-	if !hasPrev { prevBtn.SetDisabled(true) }
+	} else {
+		previousHandler = nil
+		prevColor = colors.NightBlue
+	}
 
-	nextBtn := components.NewButton(basic.Point{}, basic.Size{W: 120, H: 40}, "Prox >", colors.Dark, nil, func(b *components.Button) {
-		if hasNext {
+	if hasNext {
+		nextHandler = func(b *components.Button) {
 			s.currentPage++
 			s.init(size)
 		}
-	})
-	if !hasNext { nextBtn.SetDisabled(true) }
+	} else {
+		nextHandler = nil
+		nextColor = colors.NightBlue
+	}
 
-	navRow := components.NewRow(basic.Point{}, 20, basic.Size{W: size.W, H: 50}, basic.Center, basic.Center, []components.Widget{prevBtn, nextBtn})
+	prevBtn := components.NewButton(basic.Point{}, basic.Size{W: 150, H: 40}, "< Anterior", prevColor, nil, previousHandler)
+	nextBtn := components.NewButton(basic.Point{}, basic.Size{W: 150, H: 40}, "Próximo >", nextColor, nil, nextHandler)
 
-	backBtn := components.NewButton(basic.Point{}, basic.Size{W: 200, H: 50}, "Voltar", colors.Dark, nil, func(b *components.Button) {
-		s.stack.Pop()
-	})
+	pagRow := components.NewRow(
+		basic.Point{},
+		10,
+		basic.Size{W: size.W, H: 40},
+		basic.Center,
+		basic.Center,
+		[]components.Widget{prevBtn, nextBtn},
+	)
+
+	paginationContainer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: size.W, H: 50},
+		0,
+		nil,
+		basic.Center,
+		basic.Center,
+		pagRow,
+	)
+
+	backBtnContainer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: size.W, H: 80},
+		0,
+		nil,
+		basic.Center,
+		basic.Center,
+		components.NewButton(basic.Point{}, basic.Size{W: 400, H: 50}, "Voltar", colors.Dark, nil, func(b *components.Button) {
+			s.stack.Pop()
+		}),
+	)
 
 	s.root = components.NewColumn(
 		basic.Point{},
-		20,
+		10,
 		size,
-		basic.Center,
+		basic.Start, // Começa do topo da tela
 		basic.Center,
 		[]components.Widget{
-			title,
-			listColumn,
-			navRow,
-			backBtn,
+			titleContainer,
+			listContainer,
+			paginationContainer,
+			backBtnContainer,
 		},
 	)
 }
