@@ -7,6 +7,7 @@ import (
 
 // GameContext possui dados de interesse do jogo (tela de jogo, perfis, etc)
 type GameContext struct {
+
 	Profile              *entity.Profile
 	Match                *entity.Match
 	BattleService        BattleService
@@ -32,6 +33,7 @@ func NewGameContext() *GameContext {
 
 	return &GameContext{
 		SoundService: ss,
+		CanPopOrPush: true,
 	}
 }
 
