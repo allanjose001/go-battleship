@@ -11,7 +11,8 @@ type GameContext struct {
 	Match         *entity.Match
 	BattleService BattleService
 	SoundService  *audio.SoundService
-	Difficulty    string
+	Difficulty string
+	IsCampaign bool
 	CanPopOrPush  bool
 }
 
@@ -56,5 +57,5 @@ func (c *GameContext) SetBattleService(s BattleService) {
 }
 
 func (c *GameContext) SetDifficulty(d string) {
-	c.Difficulty = d
+    c.Difficulty = d
 }
