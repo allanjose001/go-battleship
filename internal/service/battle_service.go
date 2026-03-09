@@ -118,7 +118,7 @@ func (s *battleService) HandlePlayerClick(row, col int) (*entity.MatchResult, er
 			res.Mode = "Clássica"
 		}
 		// Registra o resultado no perfil do jogador (se existir).
-		if s.profile != nil {
+		if s.profile != nil && !s.isCampaign {
 			_, _ = AddMatchToProfile(s.profile, res)
 		}
 		return &res, nil
@@ -161,7 +161,7 @@ func (s *battleService) HandleEnemyTurn() (*entity.MatchResult, error) {
 			res.Mode = "Clássica"
 		}
 
-		if s.profile != nil {
+		if s.profile != nil && !s.isCampaign {
 			_, _ = AddMatchToProfile(s.profile, res)
 		}
 		return &res, nil
