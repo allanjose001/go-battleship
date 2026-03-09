@@ -7,7 +7,6 @@ import (
 
 // GameContext possui dados de interesse do jogo (tela de jogo, perfis, etc)
 type GameContext struct {
-
 	Profile              *entity.Profile
 	Match                *entity.Match
 	BattleService        BattleService
@@ -16,7 +15,7 @@ type GameContext struct {
 	Difficulty           string
 	IsCampaign           bool
 	IsDynamicMode        bool
-	CanPopOrPush  bool
+	CanPopOrPush         bool
 }
 
 type ContextAware interface {
@@ -37,8 +36,6 @@ func NewGameContext() *GameContext {
 		CanPopOrPush: true,
 	}
 }
-
-
 
 // BattleService define a interface para interação com a lógica de batalha.
 // Essa interface é duplicada aqui para evitar ciclos de importação com internal/service.
