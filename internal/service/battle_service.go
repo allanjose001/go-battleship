@@ -3,6 +3,7 @@ package service
 import (
 	"time"
 
+	"github.com/allanjose001/go-battleship/game/scenes/audio"
 	"github.com/allanjose001/go-battleship/internal/ai"
 	"github.com/allanjose001/go-battleship/internal/entity"
 )
@@ -33,14 +34,16 @@ type battleService struct {
 	// profile é o perfil do jogador humano, usado para registrar estatísticas de vitória/derrota.
 	profile *entity.Profile
 
+	SoundService *audio.SoundService
+
 	isCampaign bool
 }
 
 // NewBattleServiceFromMatch inicializa o serviço a partir de um Match existente no contexto.
 // Se o Match ainda não foi inicializado (runtime), ele configura a IA e inicia o jogo.
-func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool) (BattleService, error) {
+func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool, ss *audio.SoundService) (BattleService, error) {
 	setupSvc := NewBattleSetupService()
-	matchSvc := NewMatchService(nil, 500*time.Millisecond)
+	matchSvc := NewMatchService(nil, 500*time.Millisecond, ss)
 
 	var aiPlayer *ai.AIPlayer
 
@@ -102,11 +105,12 @@ func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool) (BattleServ
 	}
 
 	return &battleService{
-		matchSvc:   matchSvc,
-		match:      match,
-		aiPlayer:   aiPlayer,
-		profile:    match.Profile,
-		isCampaign: isCampaign,
+		matchSvc:     matchSvc,
+		match:        match,
+		aiPlayer:     aiPlayer,
+		profile:      match.Profile,
+		isCampaign:   isCampaign,
+		SoundService: ss,
 	}, nil
 }
 

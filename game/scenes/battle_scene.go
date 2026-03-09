@@ -56,7 +56,7 @@ func (s *BattleScene) SetSeriesState(index, pWins, eWins int) {
 
 // OnEnter é chamado quando a cena de batalha entra em foco.
 // Aqui configuramos o fundo dos tabuleiros, inicializamos o MatchService e criamos o botão de recomeçar.
-func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
+func (s *BattleScene) OnEnter(prev Scene, size basic.Size) { 
 	if s.ctx == nil || s.ctx.Match == nil {
 		return
 	}
@@ -67,7 +67,7 @@ func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
 
 	if s.ctx.BattleService != nil {
 		s.battleSvc = s.ctx.BattleService
-	} else if svc, err := service.NewBattleServiceFromMatch(match, s.ctx.IsCampaign); err == nil {
+	} else if svc, err := service.NewBattleServiceFromMatch(match, s.ctx.IsCampaign, s.ctx.SoundService); err == nil {
 		s.battleSvc = svc
 		s.ctx.SetBattleService(svc)
 	}
