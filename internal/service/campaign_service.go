@@ -76,7 +76,12 @@ func (cs *CampaignService) StartCampaignMatch(
 }
 
 // HandleCampaignResult processa o fim da partida
-func (cs *CampaignService) HandleCampaignResult(username string, diff string, m *entity.Match) error {
+func (cs *CampaignService) HandleCampaignResult(username string, diff string, m *entity.Match, playerWins, enemyWins int) error {
+	// Só salva o progresso se a série (melhor de 3) terminou
+	if playerWins < 2 && enemyWins < 2 {
+		return nil
+	}
+
 	profile, err := FindProfile(username)
 	if err != nil {
 		return err
@@ -88,6 +93,8 @@ func (cs *CampaignService) HandleCampaignResult(username string, diff string, m 
 
 	// 1. Extrai o resultado final da partida
 	result := m.Result()
+	// Sobrescreve o resultado de vitória baseado na série, não apenas na última partida
+	result.Win = playerWins >= 2
 
 	// 2. Atualiza o progresso da campanha em memória
 	profile.CurrentCampaign.DifficultyStep[diff] = result
