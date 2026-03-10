@@ -119,6 +119,19 @@ Após clonar:
 go mod tidy
 ```
 
+Para rodar o jogo:
+
+``` bash
+go run cmd/battleship/main.go
+```
+
 ------------------------------------------------------------------------
 
-Documento temporário. Estrutura pode evoluir.
+Integrantes:
+* **[Hugo Matheus Costa Araújo](https://github.com/hugomtths)**
+* **[Luís Henrique Domingos da Silva](https://github.com/LuisH07)**
+* **[Maria Luiza Bezerra dos Santos](https://github.com/marialuizab11)**
+* **[Allan José Marinho](https://github.com/allanjose001)**
+* **[Alcielma Luzinete da Silva](https://github.com/Alcielma)**
+* **[Cauã de Souza Santos](https://github.com/cauaofsouza)**
+* **[Gabriel Saraiva](https://github.com/gabrielsaraiv4)**
